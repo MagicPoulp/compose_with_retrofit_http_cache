@@ -19,6 +19,7 @@ class NewsDataRepository @Inject constructor(
 
     private lateinit var api: NewsApi
     private var initialized = false
+    private val apiKey = AppConfig.apiKey
 
     private fun createApi() = run {
         api = RetrofitHelper.getInstance(
@@ -34,7 +35,7 @@ class NewsDataRepository @Inject constructor(
                 initialized = true
                 createApi()
             }
-            val response = api.getNews()
+            val response = api.getNews(apiKey)
             if (response.isSuccessful) {
                 response.body()?.let { emit(extractDataNewsUseCase(it)) }
                 return@flow

@@ -82,7 +82,7 @@ fun TableItemRow(
                 navController.navigate(RoutingScreen.MyDetailScreen.route.replace("{rowId}", "$index"))
             }
         ) {
-            item.titre?.let { LeftAlignedText(text = it) }
+            item.title?.let { LeftAlignedText(text = it) }
         }
         Divider(
             color = Color.White,

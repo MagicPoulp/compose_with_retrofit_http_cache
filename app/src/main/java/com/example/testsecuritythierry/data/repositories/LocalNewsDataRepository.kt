@@ -30,7 +30,7 @@ class LocalNewsDataRepository @Inject constructor() {
             val response = api.getNewsPaged(pageSize, pageOffset)
             if (response.isSuccessful) {
                 response.body()?.let {
-                    return ResultOf.Success(it.elements)
+                    return ResultOf.Success(it.artObjects)
                 }
             }
             return ResultOf.Failure(response.message(), null)

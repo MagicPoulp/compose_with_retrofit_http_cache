@@ -20,6 +20,7 @@ fun DetailScreen(
     else
     {
         val itemData = stateListNews.itemSnapshotList[rowId]
+        /*
         val html = itemData?.html
         html?.let {
             AndroidView(
@@ -37,5 +38,6 @@ fun DetailScreen(
         } ?: run {
             CenterAlignedText("Missing HTML, please try another row.")
         }
+    */
     }
 }
