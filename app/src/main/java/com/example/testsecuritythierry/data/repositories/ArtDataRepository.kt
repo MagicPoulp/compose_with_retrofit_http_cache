@@ -6,7 +6,7 @@ import com.example.testsecuritythierry.data.config.AppConfig
 import com.example.testsecuritythierry.data.http.ArtApi
 import com.example.testsecuritythierry.data.http.RetrofitHelper
 import com.example.testsecuritythierry.data.models.DataArtElement
-import com.example.testsecuritythierry.domain.ExtractDataArtUseCase
+import com.example.testsecuritythierry.domain.ExtractDataArtPrefetchUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.flow
@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 class ArtDataRepository @Inject constructor(
-    val extractDataArtUseCase: ExtractDataArtUseCase
+    val extractDataArtPrefetchUseCase: ExtractDataArtPrefetchUseCase
 ) {
 
     private lateinit var api: ArtApi
@@ -23,7 +23,7 @@ class ArtDataRepository @Inject constructor(
 
     private fun createApi() = run {
         api = RetrofitHelper.getInstance(
-            baseUrl = AppConfig.newsBaseUrl,
+            baseUrl = AppConfig.artBaseUrl,
             okHttpClient = null,
             requestHeaders = null
         ).create(ArtApi::class.java)
@@ -37,7 +37,7 @@ class ArtDataRepository @Inject constructor(
             }
             val response = api.getArt(apiKey, 0, 100)
             if (response.isSuccessful) {
-                response.body()?.let { emit(extractDataArtUseCase(it)) }
+                response.body()?.let { emit(extractDataArtPrefetchUseCase(it)) }
                 return@flow
             }
         }.stateIn(
