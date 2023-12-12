@@ -5,7 +5,7 @@ import com.example.testsecuritythierry.data.models.DataArtFull
 import javax.inject.Inject
 
 class ExtractDataArtUseCase @Inject constructor() {
-    operator fun invoke(dataArtFull: DataArtFull): List<DataArtElement> {
-        return dataArtFull.artObjects.filter { it2 -> it2.title != null }
+    operator fun invoke(artObjects: List<DataArtElement>): List<DataArtElement> {
+        return artObjects.filter { it2 -> it2.title != null && it2.objectNumber != null && it2.detail != null}
     }
 }

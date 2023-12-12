@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 
 /*
-curl https://www.rijksmuseum.nl/api/nl/collection/AK-MAK-240?key=rIl6yb6x
+curl https://www.rijksmuseum.nl/api/en/collection/AK-MAK-240?key=rIl6yb6x
 */
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class DataArtFull(
@@ -17,5 +17,19 @@ data class DataArtElement(
     @JsonProperty("title")
     var title: String?,
     @JsonProperty("objectNumber")
-    val objectNumber: String,
+    val objectNumber: String?,
+    // added by the app from a second API call
+    var detail: DataArtDetail?,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class DataArtDetailFull(
+    @JsonProperty("artObjectPage")
+    var artObjectPage: DataArtDetail?,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class DataArtDetail(
+    @JsonProperty("plaqueDescription")
+    var plaqueDescription: String?,
 )
