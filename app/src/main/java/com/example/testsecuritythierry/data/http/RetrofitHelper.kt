@@ -49,9 +49,22 @@ class RetrofitHelper @Inject constructor(
         // https://stackoverflow.com/questions/44046695/get-response-class-type-in-retrofit2-interceptor-caching-for-realm
         builder.addInterceptor(Interceptor { chain ->
             val request = chain.request()
-            val response = chain.proceed(request)
+            val response: Response = (try {
+                chain.proceed(request)
+            }
+            catch (t: Throwable)
+            {
+                print(t.message)
+                if (t.message?.contains("Unable to resolve host") == true) { // no internet
+                    return@Interceptor persistentDataManager.loadResponse(request.url.toString(), request, null)
+                }
+                throw t
+            })
             if (response.isSuccessful) {
                 persistentDataManager.saveResponse(request.url.toString(), response)
+            }
+            if (response.code == 503) {
+                persistentDataManager.loadResponse(request.url.toString(), request, response)
             }
             response
         })
