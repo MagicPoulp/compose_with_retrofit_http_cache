@@ -33,14 +33,14 @@ import kotlin.time.Duration.Companion.milliseconds
 fun NavigationScreen(
     activity: ComponentActivity,
     stateListArt: LazyPagingItems<DataArtElement>,
-    newsViewModel: ArtViewModel = hiltViewModel(),
+    artViewModel: ArtViewModel = hiltViewModel(),
 ) {
     val navController = rememberNavController()
     val items = listOf(
         RoutingScreen.MyListScreen,
         RoutingScreen.MyDetailScreen,
     )
-    val activeRow = newsViewModel.activeRow.collectAsStateWithLifecycle()
+    val activeRow = artViewModel.activeRow.collectAsStateWithLifecycle()
     Scaffold(
         bottomBar = {
             BottomNavigation {
@@ -87,7 +87,8 @@ fun NavigationScreen(
                 ListScreen(
                     activeRow = activeRow.value,
                     stateListArt = stateListArt,
-                    navController = navController
+                    navController = navController,
+
                 )
             }
             // anomaly: as reported in this stack overflow, navigating, recomposes twice
@@ -103,7 +104,7 @@ fun NavigationScreen(
                 LaunchedEffect(Unit) {
                     delay(300.milliseconds)
                     if (rowId != activeRow.value) {
-                        newsViewModel.setActiveRow(owner = activity, rowId = rowId)
+                        artViewModel.setActiveRow(owner = activity, rowId = rowId)
                     }
                 }
             }

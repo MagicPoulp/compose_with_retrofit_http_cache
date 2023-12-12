@@ -25,14 +25,15 @@ import com.example.testsecuritythierry.R
 import com.example.testsecuritythierry.ui.view_models.ArtViewModel
 import com.example.testsecuritythierry.ui.view_models.UiState
 import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.launch
 
 @Composable
 fun UiStateScreen(
-    newsViewModel: ArtViewModel = hiltViewModel(),
+    artViewModel: ArtViewModel = hiltViewModel(),
     activity: ComponentActivity,
 ) {
     val unexpectedServerDataErrorString = activity.resources.getString(R.string.unexpected_server_data)
-    newsViewModel.init(
+    artViewModel.init(
         unexpectedServerDataErrorString = unexpectedServerDataErrorString
     )
     Box(contentAlignment = Alignment.TopCenter,
@@ -43,8 +44,8 @@ fun UiStateScreen(
             .fillMaxWidth()
             .fillMaxHeight()
         ) {
-            val state by newsViewModel.uiState.collectAsStateWithLifecycle()
-            val stateListArt = newsViewModel.listArt.collectAsLazyPagingItems()
+            val state by artViewModel.uiState.collectAsStateWithLifecycle()
+            val stateListArt = artViewModel.listArt.collectAsLazyPagingItems()
             when (state) {
                 // put all on ErrorScreen() to debug the error screen
                 is UiState.Empty -> ProgressIndicator()
@@ -55,31 +56,33 @@ fun UiStateScreen(
                 }
             }
 
+            LaunchedEffect(stateListArt.loadState) {
+                stateListArt.apply {
+                    if (loadState.refresh is LoadState.Error) {
+                        artViewModel.setUiState(UiState.Error((loadState.refresh as LoadState.Error).error))
+                        return@apply
+                    }
+                    if (loadState.append is LoadState.Error) {
+                        artViewModel.setUiState(UiState.Error((loadState.append as LoadState.Error).error))
+                        return@apply
+                    }
+                }
+            }
+
             // LazyPagingItems cannot be collected in the ViewModel, but it can be in a LaunchedEffect
             // https://developer.android.com/jetpack/compose/side-effects#snapshotFlow
             LaunchedEffect(Unit) {
                 snapshotFlow { stateListArt.itemSnapshotList.count() }
                     .collect { listSize ->
-                        when(val refreshState = stateListArt.loadState.refresh) {
-                            is LoadState.Loading -> {
-                                val newState = when (listSize) {
-                                    0 -> UiState.Empty
-                                    else -> UiState.Filled
-                                }
-                                newsViewModel.setUiState(newState)
-                            }
-                            is LoadState.Error -> {
-                                newsViewModel.setUiState(UiState.Error(refreshState.error))
-                            }
-                            // end of data set
-                            else -> {
-                                val newState = when (listSize) {
-                                    0 -> UiState.Error(Throwable(message = unexpectedServerDataErrorString))
-                                    else -> UiState.Filled
-                                }
-                                newsViewModel.setUiState(newState)
-                            }
+                        val loadState = stateListArt.loadState
+                        if (loadState.refresh is LoadState.Error || loadState.append is LoadState.Error) {
+                            return@collect
                         }
+                        val newState = when (listSize) {
+                            0 -> UiState.Empty
+                            else -> UiState.Filled
+                        }
+                        artViewModel.setUiState(newState)
                     }
             }
         }

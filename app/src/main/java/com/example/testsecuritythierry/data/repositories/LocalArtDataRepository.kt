@@ -38,6 +38,9 @@ class LocalArtDataRepository @Inject constructor(
                 initialized = true
                 createApi()
             }
+            // uncomment to test the error screen
+            //if (pageOffset == 2)
+            //    return ResultOf.Failure("TEST", null)
             val response = api.getArtPaged(pageSize, pageOffset)
             if (response.isSuccessful) {
                 response.body()?.let { artFull ->
