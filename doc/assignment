@@ -1,0 +1,38 @@
+tem Details
+
+When a user clicks on an item in the list, display detailed information about the selected item.
+
+Endpoint: GET /api/[culture]/collection/[object-number]
+
+API Calls:
+
+Use Coroutines to make asynchronous API calls to retrieve data for the filtered list and item details.
+
+Ensure proper error handling and data parsing.
+
+Offline Mode (Bonus):
+
+Implement an "Offline Mode" feature that allows users to access previously fetched data when the device is offline.
+
+Code Quality:
+
+Maintain clean and well-documented code.
+
+Follow the principles of SOLID, and ensure your code is maintainable and testable.
+
+Additional Considerations:
+
+Implement navigation between the filtered list and item details screens.
+
+Handle configuration changes gracefully.
+
+Handle edge cases and errors effectively.
+
+Use of third party libraries must be justified.
+
+
+Submission:
+Once you have completed the project, send us the GitHub repository link, any additional setup instructions, and a brief documentation outlining your app's architecture, how to build and run it, and any notable design patterns or libraries you used.
+
+
+Assessment: Your work will be evaluated based on the quality of your code, adherence to best practices, UI/UX design, error handling, and the overall functionality and performance of the app.

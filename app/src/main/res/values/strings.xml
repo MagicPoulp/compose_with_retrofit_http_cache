@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Test Compose News Thierry</string>
+    <string name="total_api_key">wMjM2OTgwZDU4YTBhNjA4ZjhiNDQ3NTE3MTQzYjNkODk4NzhjZDRjY2VlNDIxZTljZGM1NDA1NTBjYw</string>
+    <string name="unexpected_server_data">Unexpected server data</string>
+    <string name="my_list_screen">List</string>
+    <string name="my_detail_screen">Detail</string>
+</resources>
