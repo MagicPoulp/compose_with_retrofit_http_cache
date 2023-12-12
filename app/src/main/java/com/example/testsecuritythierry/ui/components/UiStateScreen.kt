@@ -23,6 +23,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.testsecuritythierry.R
 import com.example.testsecuritythierry.ui.view_models.ArtViewModel
 import com.example.testsecuritythierry.ui.view_models.UiState
+import kotlinx.coroutines.flow.onCompletion
 
 @Composable
 fun UiStateScreen(
@@ -49,9 +50,9 @@ fun UiStateScreen(
                 }
             }
 
-            // LazyPagingItems cannot collected in the ViewModel, but it can be in a LaunchedEffect
+            // LazyPagingItems cannot be collected in the ViewModel, but it can be in a LaunchedEffect
             // https://developer.android.com/jetpack/compose/side-effects#snapshotFlow
-            LaunchedEffect(state) {
+            LaunchedEffect(Unit) {
                 snapshotFlow { stateListArt.itemSnapshotList.count() }
                     .collect {
                         val newState = when (it) {

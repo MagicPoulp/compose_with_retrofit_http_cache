@@ -35,6 +35,9 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import java.security.KeyStore
@@ -48,6 +51,10 @@ class MainActivityViewModel @Inject constructor(
 
     private lateinit var newsDataFlow: Flow<List<DataArtElement>>
     var savedArtData: List<DataArtElement>? = null
+    // The UI state for showing the first page with a spinner or not
+    private val _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState.Empty)
+    val uiState: StateFlow<UiState>
+        get() = _uiState.asStateFlow()
 
     // ------------------------------------------
     // non flow variables
@@ -64,6 +71,11 @@ class MainActivityViewModel @Inject constructor(
             owner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 newsDataFlow.collect {
                     savedArtData = it
+                    savedArtData?.let { savedArtData2 ->
+                        if (savedArtData2.isNotEmpty()) {
+                            _uiState.emit(UiState.Filled)
+                        }
+                    }
                 }
             }
         }

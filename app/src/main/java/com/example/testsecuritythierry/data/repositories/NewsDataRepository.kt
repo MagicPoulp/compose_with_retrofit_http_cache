@@ -35,7 +35,7 @@ class ArtDataRepository @Inject constructor(
                 initialized = true
                 createApi()
             }
-            val response = api.getArt(apiKey)
+            val response = api.getArt(apiKey, 0, 100)
             if (response.isSuccessful) {
                 response.body()?.let { emit(extractDataArtUseCase(it)) }
                 return@flow

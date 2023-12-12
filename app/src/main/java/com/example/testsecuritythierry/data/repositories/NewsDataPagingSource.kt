@@ -13,10 +13,11 @@ class ArtDataPagingSource (
 ) : PagingSource<Int, DataArtElement>() {
 
     override suspend fun load(params: LoadParams<Int>):  LoadResult<Int, DataArtElement> {
+        // here we wait for the MainActivityViewModel to have loaded
         val nextPageNumber = params.key ?: 1
         val response = localArtDataRepository.getArtPaged(AppConfig.pagingSize, nextPageNumber)
         return when (response) {
-            is ResultOf.Success -> {
+            is ResultOf.Success -> if (response.value.isEmpty()) LoadResult.Error(Exception(unexpectedServerDataErrorString)) else {
                 LoadResult.Page(
                     data = response.value,
                     prevKey = if (nextPageNumber > 1) nextPageNumber - 1 else null,
