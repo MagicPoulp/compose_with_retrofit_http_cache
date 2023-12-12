@@ -6,6 +6,6 @@ import javax.inject.Inject
 
 class ExtractDataNewsUseCase @Inject constructor() {
     operator fun invoke(dataNewsFull: DataNewsFull): List<DataNewsElement> {
-        return dataNewsFull.elements.filter { it2 -> it2.titre != null }
+        return dataNewsFull.artObjects.filter { it2 -> it2.title != null }
     }
 }

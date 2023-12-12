@@ -132,7 +132,7 @@ class MainActivityViewModel @Inject constructor(
                                     savedNewsData?.let { it1 ->
                                         call.respond(
                                             DataNewsFull(
-                                                elements = it1.safeSubList(
+                                                artObjects = it1.safeSubList(
                                                     (pageOffset - 1) * pageSize,
                                                     pageOffset * pageSize,
                                                 )
