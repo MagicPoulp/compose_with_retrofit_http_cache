@@ -34,6 +34,10 @@ class ArtDataRepository @Inject constructor(
             // uncomment to test the error screen
             //if (pageOffset == 2)
             //    return ResultOf.Failure("TEST", null)
+            // chaining the 2 API calls makes things very simple
+            // but it slows down the display of the list
+            // we could have a parallel coroutine that tries to prefetch
+            // data, and clicking forces the fetching
             val response = api.getArtPaged(apiKey, pageSize, pageOffset)
             if (response.isSuccessful) {
                 response.body()?.let { artFull ->

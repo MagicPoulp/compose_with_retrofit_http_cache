@@ -4,8 +4,14 @@ import com.example.testsecuritythierry.data.models.DataResponseRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.query
+import okhttp3.Headers
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.Protocol
+import okhttp3.Request
 import okhttp3.Response
 import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.toResponseBody
 import okio.Buffer
 import java.io.IOException
 import javax.inject.Inject
@@ -14,6 +20,13 @@ import javax.inject.Inject
 class PersistentDataManager @Inject constructor(
     ) {
     private var realm: Realm
+    val responseHeaders = Headers.Builder()
+        .add("content-type", "application/json")
+        .add("strict-transport-security", "max-age=2592000")
+        .add("request-context", "appId=cid-v1:5f69f122-c4a2-4f7d-8b1e-6d66af0e0e99")
+        .add("x-powered-by", "ASP.NET")
+        .add("x-cache", "CONFIG_NOCACHE")
+        .build()
 
     init {
         val config = RealmConfiguration.create(schema = setOf(DataResponseRealm::class))
@@ -22,10 +35,10 @@ class PersistentDataManager @Inject constructor(
 
     fun saveResponse(url: String, response: Response) {
         try {
+            val h = response.headers.toString()
             response.body?.let { body2 ->
                 val body3 = copyBody(body2, 1000000)
                 body3?.let { body4 ->
-                    //val data = realm.query<DataResponseRealm>("url == $0", url).find().first()
                     realm.writeBlocking {
                         copyToRealm(
                             DataResponseRealm(
@@ -38,6 +51,28 @@ class PersistentDataManager @Inject constructor(
             }
         } catch(t: Throwable) {
             println(t.message)
+        }
+    }
+
+    fun loadResponse(url: String, request: Request, response: Response?) : Response {
+        try {
+            var result: Response? = null
+            realm.writeBlocking {
+                val data = realm.query<DataResponseRealm>("url == $0", url).find().first()
+                val builder: Response.Builder = Response.Builder()
+                builder
+                    .protocol(response?.protocol ?: Protocol.HTTP_2)
+                    .request(request)
+                    .headers(responseHeaders)
+                    .code(200)
+                    .message("success")
+                    .body(data.body.toResponseBody(String.format("application/json; charset=utf-8").toMediaType()))
+                result = builder.build()
+            }
+            return result!!
+        } catch(t: Throwable) {
+            println(t.message)
+            throw t
         }
     }
 
