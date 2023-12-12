@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.testsecuritythierry.R
 import com.example.testsecuritythierry.ui.view_models.ArtViewModel
@@ -30,8 +31,9 @@ fun UiStateScreen(
     newsViewModel: ArtViewModel = hiltViewModel(),
     activity: ComponentActivity,
 ) {
+    val unexpectedServerDataErrorString = activity.resources.getString(R.string.unexpected_server_data)
     newsViewModel.init(
-        unexpectedServerDataErrorString = activity.resources.getString(R.string.unexpected_server_data)
+        unexpectedServerDataErrorString = unexpectedServerDataErrorString
     )
     Box(contentAlignment = Alignment.TopCenter,
         modifier = Modifier
@@ -44,7 +46,10 @@ fun UiStateScreen(
             val state by newsViewModel.uiState.collectAsStateWithLifecycle()
             val stateListArt = newsViewModel.listArt.collectAsLazyPagingItems()
             when (state) {
+                // put all on ErrorScreen() to debug the error screen
+                is UiState.Empty -> ProgressIndicator()
                 UiState.Filled -> NavigationScreen(activity = activity, stateListArt = stateListArt)
+                is UiState.Error -> ErrorScreen(state)
                 else -> Row {
                     ProgressIndicator()
                 }
@@ -54,12 +59,27 @@ fun UiStateScreen(
             // https://developer.android.com/jetpack/compose/side-effects#snapshotFlow
             LaunchedEffect(Unit) {
                 snapshotFlow { stateListArt.itemSnapshotList.count() }
-                    .collect {
-                        val newState = when (it) {
-                            0 -> UiState.Empty
-                            else -> UiState.Filled
+                    .collect { listSize ->
+                        when(val refreshState = stateListArt.loadState.refresh) {
+                            is LoadState.Loading -> {
+                                val newState = when (listSize) {
+                                    0 -> UiState.Empty
+                                    else -> UiState.Filled
+                                }
+                                newsViewModel.setUiState(newState)
+                            }
+                            is LoadState.Error -> {
+                                newsViewModel.setUiState(UiState.Error(refreshState.error))
+                            }
+                            // end of data set
+                            else -> {
+                                val newState = when (listSize) {
+                                    0 -> UiState.Error(Throwable(message = unexpectedServerDataErrorString))
+                                    else -> UiState.Filled
+                                }
+                                newsViewModel.setUiState(newState)
+                            }
                         }
-                        newsViewModel.setUiState(newState)
                     }
             }
         }

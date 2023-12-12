@@ -20,24 +20,6 @@ fun DetailScreen(
     else
     {
         val itemData = stateListArt.itemSnapshotList[rowId]
-        /*
-        val html = itemData?.html
-        html?.let {
-            AndroidView(
-                factory = {
-                    WebView(it).apply {
-                        layoutParams = ViewGroup.LayoutParams(
-                            ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.MATCH_PARENT
-                        )
-                        webViewClient = WebViewClient()
-                        loadData(html, "text/html", "UTF-8")
-                    }
-                }
-            )
-        } ?: run {
-            CenterAlignedText("Missing HTML, please try another row.")
-        }
-    */
+        itemData?.detail?.plaqueDescription?.let { CenterAlignedText(it) }
     }
 }
