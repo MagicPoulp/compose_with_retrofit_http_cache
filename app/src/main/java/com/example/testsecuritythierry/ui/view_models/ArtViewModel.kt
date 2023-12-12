@@ -22,7 +22,7 @@ import javax.inject.Inject
 sealed class UiState {
     object Empty : UiState()
     object InProgress : UiState()
-    object Error : UiState()
+    class Error(val error: Throwable) : UiState()
     object Filled : UiState()
 }
 
