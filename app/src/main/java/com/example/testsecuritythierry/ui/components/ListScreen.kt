@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.paging.compose.LazyPagingItems
-import com.example.testsecuritythierry.data.models.DataNewsElement
+import com.example.testsecuritythierry.data.models.DataArtElement
 import com.example.testsecuritythierry.ui.reusable_components.LeftAlignedText
 import com.example.testsecuritythierry.ui.setup.RoutingScreen
 import java.lang.Math.floor
@@ -35,7 +35,7 @@ val statusAreaWidth = (floor(goldenNumber * 60)).dp
 @Composable
 fun ListScreen(
     activeRow: Int,
-    stateListNews: LazyPagingItems<DataNewsElement>,
+    stateListArt: LazyPagingItems<DataArtElement>,
     navController: NavController,
 ) {
     // keep the scrolling state upon screen rotation
@@ -49,16 +49,16 @@ fun ListScreen(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(horizontal = horizontalMargin),
         ) {
-            // as stated at the link below, items(stateListNews.itemSnapshotList) does not work with AppConfig.pagingSize = 10, and total items = 48
+            // as stated at the link below, items(stateListArt.itemSnapshotList) does not work with AppConfig.pagingSize = 10, and total items = 48
             // but it works using the itemsIndex alternative
             // https://stackoverflow.com/questions/75960184/why-jetpack-compose-room-offline-pagination-not-loading-next-page
-            //items(stateListNews.itemSnapshotList) {item ->
+            //items(stateListArt.itemSnapshotList) {item ->
             //item?.let {
             //    TableItemRow(item)
             //}
             //}
-            itemsIndexed(stateListNews.itemSnapshotList) { index, _ ->
-                stateListNews[index]?.let { TableItemRow(activeRow = activeRow, item = it, index = index, navController = navController) }
+            itemsIndexed(stateListArt.itemSnapshotList) { index, _ ->
+                stateListArt[index]?.let { TableItemRow(activeRow = activeRow, item = it, index = index, navController = navController) }
             }
         }
     }
@@ -67,7 +67,7 @@ fun ListScreen(
 @Composable
 fun TableItemRow(
     activeRow: Int,
-    item: DataNewsElement, index: Int, navController: NavController,
+    item: DataArtElement, index: Int, navController: NavController,
 ) {
     //val activeRow = newsViewModel.activeRow.collectAsStateWithLifecycle()
     val isPreviousActiveRow = index == activeRow

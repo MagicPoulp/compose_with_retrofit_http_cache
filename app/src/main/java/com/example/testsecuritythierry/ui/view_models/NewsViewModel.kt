@@ -8,9 +8,9 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.testsecuritythierry.data.config.AppConfig
-import com.example.testsecuritythierry.data.models.DataNewsElement
-import com.example.testsecuritythierry.data.repositories.LocalNewsDataRepository
-import com.example.testsecuritythierry.data.repositories.NewsDataPagingSource
+import com.example.testsecuritythierry.data.models.DataArtElement
+import com.example.testsecuritythierry.data.repositories.LocalArtDataRepository
+import com.example.testsecuritythierry.data.repositories.ArtDataPagingSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,11 +27,11 @@ sealed class UiState {
 }
 
 @HiltViewModel
-class NewsViewModel @Inject constructor(
-    private val localNewsDataRepository: LocalNewsDataRepository,
+class ArtViewModel @Inject constructor(
+    private val localArtDataRepository: LocalArtDataRepository,
 ) : ViewModel() {
     // the list of packages installed on the device
-    lateinit var listNews: Flow<PagingData<DataNewsElement>>
+    lateinit var listArt: Flow<PagingData<DataArtElement>>
     // The UI state for showing the first page with a spinner or not
     private val _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState.Empty)
     val uiState: StateFlow<UiState>
@@ -52,8 +52,8 @@ class NewsViewModel @Inject constructor(
 
         // one can add a RemoteMediator for caching
         // https://developer.android.com/topic/libraries/architecture/paging/v3-network-db
-        listNews = Pager(PagingConfig(pageSize = AppConfig.pagingSize)) {
-            NewsDataPagingSource(unexpectedServerDataErrorString, localNewsDataRepository)
+        listArt = Pager(PagingConfig(pageSize = AppConfig.pagingSize)) {
+            ArtDataPagingSource(unexpectedServerDataErrorString, localArtDataRepository)
         }.flow
     }
 

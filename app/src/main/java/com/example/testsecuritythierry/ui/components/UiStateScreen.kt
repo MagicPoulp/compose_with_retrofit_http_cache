@@ -21,12 +21,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.testsecuritythierry.R
-import com.example.testsecuritythierry.ui.view_models.NewsViewModel
+import com.example.testsecuritythierry.ui.view_models.ArtViewModel
 import com.example.testsecuritythierry.ui.view_models.UiState
 
 @Composable
 fun UiStateScreen(
-    newsViewModel: NewsViewModel = hiltViewModel(),
+    newsViewModel: ArtViewModel = hiltViewModel(),
     activity: ComponentActivity,
 ) {
     newsViewModel.init(
@@ -41,9 +41,9 @@ fun UiStateScreen(
             .fillMaxHeight()
         ) {
             val state by newsViewModel.uiState.collectAsStateWithLifecycle()
-            val stateListNews = newsViewModel.listNews.collectAsLazyPagingItems()
+            val stateListArt = newsViewModel.listArt.collectAsLazyPagingItems()
             when (state) {
-                UiState.Filled -> NavigationScreen(activity = activity, stateListNews = stateListNews)
+                UiState.Filled -> NavigationScreen(activity = activity, stateListArt = stateListArt)
                 else -> Row {
                     ProgressIndicator()
                 }
@@ -52,7 +52,7 @@ fun UiStateScreen(
             // LazyPagingItems cannot collected in the ViewModel, but it can be in a LaunchedEffect
             // https://developer.android.com/jetpack/compose/side-effects#snapshotFlow
             LaunchedEffect(state) {
-                snapshotFlow { stateListNews.itemSnapshotList.count() }
+                snapshotFlow { stateListArt.itemSnapshotList.count() }
                     .collect {
                         val newState = when (it) {
                             0 -> UiState.Empty

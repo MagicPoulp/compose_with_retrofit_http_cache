@@ -11,9 +11,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewModelScope
 import com.example.testsecuritythierry.R
 import com.example.testsecuritythierry.data.config.AppConfig
-import com.example.testsecuritythierry.data.models.DataNewsElement
-import com.example.testsecuritythierry.data.models.DataNewsFull
-import com.example.testsecuritythierry.data.repositories.NewsDataRepository
+import com.example.testsecuritythierry.data.models.DataArtElement
+import com.example.testsecuritythierry.data.models.DataArtFull
+import com.example.testsecuritythierry.data.repositories.ArtDataRepository
 import com.example.testsecuritythierry.ui.MainActivity
 import com.example.testsecuritythierry.ui.setup.safeSubList
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
@@ -43,11 +43,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
-    private val newsDataRepository: NewsDataRepository,
+    private val newsDataRepository: ArtDataRepository,
 ) : ViewModel() {
 
-    private lateinit var newsDataFlow: Flow<List<DataNewsElement>>
-    var savedNewsData: List<DataNewsElement>? = null
+    private lateinit var newsDataFlow: Flow<List<DataArtElement>>
+    var savedArtData: List<DataArtElement>? = null
 
     // ------------------------------------------
     // non flow variables
@@ -59,11 +59,11 @@ class MainActivityViewModel @Inject constructor(
         }
         initialized = true
 
-        newsDataFlow = newsDataRepository.getNewsFlow(owner)
+        newsDataFlow = newsDataRepository.getArtFlow(owner)
         owner.lifecycleScope.launch {
             owner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 newsDataFlow.collect {
-                    savedNewsData = it
+                    savedArtData = it
                 }
             }
         }
@@ -129,9 +129,9 @@ class MainActivityViewModel @Inject constructor(
                                     }
                                     // if missing parameters, return an error
                                     // or if the saved data is missing, return an error
-                                    savedNewsData?.let { it1 ->
+                                    savedArtData?.let { it1 ->
                                         call.respond(
-                                            DataNewsFull(
+                                            DataArtFull(
                                                 artObjects = it1.safeSubList(
                                                     (pageOffset - 1) * pageSize,
                                                     pageOffset * pageSize,

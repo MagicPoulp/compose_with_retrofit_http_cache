@@ -7,16 +7,15 @@ import com.fasterxml.jackson.annotation.JsonProperty
 curl https://www.rijksmuseum.nl/api/nl/collection/AK-MAK-240?key=rIl6yb6x
 */
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class DataNewsFull(
+data class DataArtFull(
     @JsonProperty("artObjects")
-    val artObjects: List<DataNewsElement>,
+    val artObjects: List<DataArtElement>,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class DataNewsElement(
+data class DataArtElement(
     @JsonProperty("title")
     var title: String?,
-    /*
     @JsonProperty("objectNumber")
-    val objectNumber: String,*/
+    val objectNumber: String,
 )

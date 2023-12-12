@@ -6,20 +6,20 @@ import android.webkit.WebViewClient
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.paging.compose.LazyPagingItems
-import com.example.testsecuritythierry.data.models.DataNewsElement
+import com.example.testsecuritythierry.data.models.DataArtElement
 import com.example.testsecuritythierry.ui.reusable_components.CenterAlignedText
 
 @Composable
 fun DetailScreen(
-    stateListNews: LazyPagingItems<DataNewsElement>,
+    stateListArt: LazyPagingItems<DataArtElement>,
     rowId: Int,
 ) {
-    if (rowId > stateListNews.itemCount - 1 ) {
+    if (rowId > stateListArt.itemCount - 1 ) {
         CenterAlignedText("Error")
     }
     else
     {
-        val itemData = stateListNews.itemSnapshotList[rowId]
+        val itemData = stateListArt.itemSnapshotList[rowId]
         /*
         val html = itemData?.html
         html?.let {
