@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -42,6 +43,7 @@ fun NavigationScreen(
     )
     val activeRow = artViewModel.activeRow.collectAsStateWithLifecycle()
     Scaffold(
+        backgroundColor = MaterialTheme.colors.secondary,
         bottomBar = {
             BottomNavigation {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
