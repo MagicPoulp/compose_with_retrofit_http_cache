@@ -1,6 +1,5 @@
 package com.example.testsecuritythierry.ui.components
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,13 +25,10 @@ import androidx.paging.compose.LazyPagingItems
 import com.example.testsecuritythierry.data.models.DataArtElement
 import com.example.testsecuritythierry.ui.reusable_components.LeftAlignedText
 import com.example.testsecuritythierry.ui.setup.RoutingScreen
-import com.example.testsecuritythierry.ui.view_models.ArtViewModel
-import java.lang.Math.floor
 
 val horizontalMargin = 20.dp
 val rowHeight = 60.dp
-const val goldenNumber = 1.618
-val statusAreaWidth = (floor(goldenNumber * 60)).dp
+//const val goldenNumber = 1.618
 
 @Composable
 fun ListScreen(
@@ -48,7 +44,9 @@ fun ListScreen(
     ) {
         LazyColumn(
             state = listState,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colors.secondary),
             contentPadding = PaddingValues(horizontal = horizontalMargin),
         ) {
             // as stated at the link below, items(stateListArt.itemSnapshotList) does not work with AppConfig.pagingSize = 10, and total items = 48
