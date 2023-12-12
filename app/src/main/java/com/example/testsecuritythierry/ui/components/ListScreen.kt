@@ -1,5 +1,6 @@
 package com.example.testsecuritythierry.ui.components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +26,7 @@ import androidx.paging.compose.LazyPagingItems
 import com.example.testsecuritythierry.data.models.DataArtElement
 import com.example.testsecuritythierry.ui.reusable_components.LeftAlignedText
 import com.example.testsecuritythierry.ui.setup.RoutingScreen
+import com.example.testsecuritythierry.ui.view_models.ArtViewModel
 import java.lang.Math.floor
 
 val horizontalMargin = 20.dp
@@ -69,7 +71,7 @@ fun TableItemRow(
     activeRow: Int,
     item: DataArtElement, index: Int, navController: NavController,
 ) {
-    //val activeRow = newsViewModel.activeRow.collectAsStateWithLifecycle()
+    //val activeRow = artViewModel.activeRow.collectAsStateWithLifecycle()
     val isPreviousActiveRow = index == activeRow
     Box(
         modifier = Modifier
