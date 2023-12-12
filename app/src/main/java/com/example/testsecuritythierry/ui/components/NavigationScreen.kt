@@ -23,17 +23,17 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.paging.compose.LazyPagingItems
-import com.example.testsecuritythierry.data.models.DataNewsElement
+import com.example.testsecuritythierry.data.models.DataArtElement
 import com.example.testsecuritythierry.ui.setup.RoutingScreen
-import com.example.testsecuritythierry.ui.view_models.NewsViewModel
+import com.example.testsecuritythierry.ui.view_models.ArtViewModel
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun NavigationScreen(
     activity: ComponentActivity,
-    stateListNews: LazyPagingItems<DataNewsElement>,
-    newsViewModel: NewsViewModel = hiltViewModel(),
+    stateListArt: LazyPagingItems<DataArtElement>,
+    newsViewModel: ArtViewModel = hiltViewModel(),
 ) {
     val navController = rememberNavController()
     val items = listOf(
@@ -86,7 +86,7 @@ fun NavigationScreen(
             composable(RoutingScreen.MyListScreen.route) {
                 ListScreen(
                     activeRow = activeRow.value,
-                    stateListNews = stateListNews,
+                    stateListArt = stateListArt,
                     navController = navController
                 )
             }
@@ -99,7 +99,7 @@ fun NavigationScreen(
                 } catch (_: Exception) {
                     previousRow
                 }
-                DetailScreen(stateListNews = stateListNews, rowId = rowId)
+                DetailScreen(stateListArt = stateListArt, rowId = rowId)
                 LaunchedEffect(Unit) {
                     delay(300.milliseconds)
                     if (rowId != activeRow.value) {

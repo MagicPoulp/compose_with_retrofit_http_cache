@@ -3,21 +3,21 @@ package com.example.testsecuritythierry.data.repositories
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.example.testsecuritythierry.data.config.AppConfig
-import com.example.testsecuritythierry.data.http.NewsApi
+import com.example.testsecuritythierry.data.http.ArtApi
 import com.example.testsecuritythierry.data.http.RetrofitHelper
-import com.example.testsecuritythierry.data.models.DataNewsElement
-import com.example.testsecuritythierry.domain.ExtractDataNewsUseCase
+import com.example.testsecuritythierry.data.models.DataArtElement
+import com.example.testsecuritythierry.domain.ExtractDataArtUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
-class NewsDataRepository @Inject constructor(
-    val extractDataNewsUseCase: ExtractDataNewsUseCase
+class ArtDataRepository @Inject constructor(
+    val extractDataArtUseCase: ExtractDataArtUseCase
 ) {
 
-    private lateinit var api: NewsApi
+    private lateinit var api: ArtApi
     private var initialized = false
     private val apiKey = AppConfig.apiKey
 
@@ -26,18 +26,18 @@ class NewsDataRepository @Inject constructor(
             baseUrl = AppConfig.newsBaseUrl,
             okHttpClient = null,
             requestHeaders = null
-        ).create(NewsApi::class.java)
+        ).create(ArtApi::class.java)
     }
 
-    fun getNewsFlow(owner: LifecycleOwner): Flow<List<DataNewsElement>> {
+    fun getArtFlow(owner: LifecycleOwner): Flow<List<DataArtElement>> {
         return flow {
             if (!initialized) {
                 initialized = true
                 createApi()
             }
-            val response = api.getNews(apiKey)
+            val response = api.getArt(apiKey)
             if (response.isSuccessful) {
-                response.body()?.let { emit(extractDataNewsUseCase(it)) }
+                response.body()?.let { emit(extractDataArtUseCase(it)) }
                 return@flow
             }
         }.stateIn(
