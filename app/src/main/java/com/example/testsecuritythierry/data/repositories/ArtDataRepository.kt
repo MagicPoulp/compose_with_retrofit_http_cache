@@ -10,6 +10,7 @@ import javax.inject.Inject
 
 class ArtDataRepository @Inject constructor(
     val extractDataArtUseCase: ExtractDataArtUseCase,
+    private val retrofitHelper: RetrofitHelper,
 ) {
 
     private lateinit var api: ArtApi
@@ -17,7 +18,7 @@ class ArtDataRepository @Inject constructor(
     private val apiKey = AppConfig.apiKey
 
     private fun createApi() = run {
-        api = RetrofitHelper.getInstance(
+        api = retrofitHelper.getInstance(
             baseUrl = AppConfig.artBaseUrl,
             okHttpClient = null,
             requestHeaders = null

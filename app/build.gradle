@@ -3,15 +3,16 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
+    id 'io.realm.kotlin'
 }
 
 android {
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.example.testsecuritythierry"
         minSdk 21
-        targetSdk 33
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -107,4 +108,8 @@ dependencies {
     //androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     //debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     //debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
+
+    // realm
+    implementation 'io.realm.kotlin:library-base:1.11.0'
+    implementation 'io.realm.kotlin:library-sync:1.11.0'
 }

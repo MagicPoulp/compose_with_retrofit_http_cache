@@ -2,6 +2,7 @@ package com.example.testsecuritythierry.data.models
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import io.realm.kotlin.types.RealmObject
 
 /*
 curl https://www.rijksmuseum.nl/api/en/collection/AK-MAK-240?key=rIl6yb6x
