@@ -9,13 +9,13 @@ import com.example.testsecuritythierry.data.models.DataArtElement
 // https://betterprogramming.pub/turn-the-page-overview-of-android-paging3-library-integration-with-jetpack-compose-3a7881ed75b4
 class ArtDataPagingSource (
     private val unexpectedServerDataErrorString: String,
-    private val localArtDataRepository: LocalArtDataRepository
+    private val artDataRepository: ArtDataRepository
 ) : PagingSource<Int, DataArtElement>() {
 
     override suspend fun load(params: LoadParams<Int>):  LoadResult<Int, DataArtElement> {
         // here we wait for the MainActivityViewModel to have loaded
         val nextPageNumber = params.key ?: 1
-        return when (val response = localArtDataRepository.getArtPaged(AppConfig.pagingSize, nextPageNumber)) {
+        return when (val response = artDataRepository.getArtPaged(AppConfig.pagingSize, nextPageNumber)) {
             is ResultOf.Success -> if (response.value.isEmpty()) LoadResult.Error(Exception(unexpectedServerDataErrorString)) else {
                 LoadResult.Page(
                     data = response.value,

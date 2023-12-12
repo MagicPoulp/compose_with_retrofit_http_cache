@@ -8,6 +8,6 @@ import retrofit2.http.Query
 // Retrofit interface
 
 interface LocalArtApi {
-    @GET("/news")
-    suspend fun getArtPaged(@Query("pageSize") pageSize: Int, @Query("pageOffset") pageOffset: Int): Response<DataArtFull>
+    @GET("/api/en/collection")
+    suspend fun getArtPaged(@Query("key") key: String, @Query("ps") pageSize: Int, @Query("p") pageOffset: Int): Response<DataArtFull>
 }

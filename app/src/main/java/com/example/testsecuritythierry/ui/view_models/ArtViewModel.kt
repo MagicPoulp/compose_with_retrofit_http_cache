@@ -9,7 +9,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.testsecuritythierry.data.config.AppConfig
 import com.example.testsecuritythierry.data.models.DataArtElement
-import com.example.testsecuritythierry.data.repositories.LocalArtDataRepository
+import com.example.testsecuritythierry.data.repositories.ArtDataRepository
 import com.example.testsecuritythierry.data.repositories.ArtDataPagingSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -28,7 +28,7 @@ sealed class UiState {
 
 @HiltViewModel
 class ArtViewModel @Inject constructor(
-    private val localArtDataRepository: LocalArtDataRepository,
+    private val artDataRepository: ArtDataRepository,
 ) : ViewModel() {
     // the list of packages installed on the device
     lateinit var listArt: Flow<PagingData<DataArtElement>>
@@ -53,7 +53,7 @@ class ArtViewModel @Inject constructor(
         // one can add a RemoteMediator for caching
         // https://developer.android.com/topic/libraries/architecture/paging/v3-network-db
         listArt = Pager(PagingConfig(pageSize = AppConfig.pagingSize)) {
-            ArtDataPagingSource(unexpectedServerDataErrorString, localArtDataRepository)
+            ArtDataPagingSource(unexpectedServerDataErrorString, artDataRepository)
         }.flow
     }
 
@@ -64,6 +64,8 @@ class ArtViewModel @Inject constructor(
     }
 
     suspend fun setUiState(newUiState: UiState) {
-        _uiState.emit(newUiState)
+        if (newUiState != _uiState) {
+            _uiState.emit(newUiState)
+        }
     }
 }

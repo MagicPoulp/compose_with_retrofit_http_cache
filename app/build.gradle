@@ -90,18 +90,6 @@ dependencies {
     implementation "androidx.paging:paging-compose:3.2.0-rc01"
     implementation "androidx.paging:paging-common:3.1.1"
 
-    // ktor local server to simulate the paging on a real API
-    implementation "io.ktor:ktor-server-core:$ktor_version"
-    implementation "io.ktor:ktor-server-netty:$ktor_version"
-    implementation "io.ktor:ktor-network-tls-certificates:$ktor_version"
-    // logback-android works but logback is not working, even with a resources folder
-    //implementation "ch.qos.logback:logback-classic:$logback_version"
-    //implementation "ch.qos.logback:logback-core:$logback_version"
-    implementation "org.slf4j:slf4j-api:2.0.7"
-    implementation 'com.github.tony19:logback-android:3.0.0'
-    implementation "io.ktor:ktor-server-content-negotiation:$ktor_version"
-    implementation "io.ktor:ktor-serialization-jackson:$ktor_version"
-
     // injection
     // Hilt is promotted by Google and it has better runtime performance than Koin
     implementation "com.google.dagger:hilt-android:$dagger_version"

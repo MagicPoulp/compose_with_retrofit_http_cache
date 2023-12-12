@@ -38,7 +38,8 @@ fun UiStateScreen(
     )
     Box(contentAlignment = Alignment.TopCenter,
         modifier = Modifier
-        .fillMaxSize() ) {
+            .background(MaterialTheme.colors.secondary)
+            .fillMaxSize() ) {
         Row(modifier = Modifier
             .background(MaterialTheme.colors.primaryVariant)
             .fillMaxWidth()
