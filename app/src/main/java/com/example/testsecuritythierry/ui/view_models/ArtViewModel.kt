@@ -7,10 +7,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import com.example.testsecuritythierry.BuildConfig
 import com.example.testsecuritythierry.data.config.AppConfig
 import com.example.testsecuritythierry.data.models.DataArtElement
 import com.example.testsecuritythierry.data.repositories.ArtDataRepository
 import com.example.testsecuritythierry.data.repositories.ArtDataPagingSource
+import com.example.testsecuritythierry.data.repositories.PersistentDataManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,6 +31,7 @@ sealed class UiState {
 @HiltViewModel
 class ArtViewModel @Inject constructor(
     private val artDataRepository: ArtDataRepository,
+    private val persistentDataManager: PersistentDataManager,
 ) : ViewModel() {
     // the list of packages installed on the device
     lateinit var listArt: Flow<PagingData<DataArtElement>>
@@ -64,8 +67,16 @@ class ArtViewModel @Inject constructor(
     }
 
     suspend fun setUiState(newUiState: UiState) {
+        if (BuildConfig.DEBUG && newUiState is UiState.Error) {
+            println(newUiState.error.message)
+        }
         if (newUiState != _uiState) {
             _uiState.emit(newUiState)
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        persistentDataManager.close()
     }
 }
