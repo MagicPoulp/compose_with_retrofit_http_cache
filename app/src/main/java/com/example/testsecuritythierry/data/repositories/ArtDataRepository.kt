@@ -3,9 +3,7 @@ package com.example.testsecuritythierry.data.repositories
 import com.example.testsecuritythierry.data.config.AppConfig
 import com.example.testsecuritythierry.data.custom_structures.ResultOf
 import com.example.testsecuritythierry.data.http.ArtApi
-import com.example.testsecuritythierry.data.http.LocalArtApi
 import com.example.testsecuritythierry.data.http.RetrofitHelper
-import com.example.testsecuritythierry.data.http.UnsafeOkHttpClient
 import com.example.testsecuritythierry.data.models.DataArtElement
 import com.example.testsecuritythierry.domain.ExtractDataArtUseCase
 import javax.inject.Inject
@@ -14,19 +12,12 @@ class ArtDataRepository @Inject constructor(
     val extractDataArtUseCase: ExtractDataArtUseCase,
 ) {
 
-    private lateinit var api: LocalArtApi
-    private lateinit var apiDetail: ArtApi
+    private lateinit var api: ArtApi
     private var initialized = false
     private val apiKey = AppConfig.apiKey
 
     private fun createApi() = run {
         api = RetrofitHelper.getInstance(
-            baseUrl = AppConfig.artBaseUrl,
-            okHttpClient = UnsafeOkHttpClient.unsafeOkHttpClient,
-            requestHeaders = listOf(Pair(first = "Accept", second = "application/json"))
-        ).create(LocalArtApi::class.java)
-
-        apiDetail = RetrofitHelper.getInstance(
             baseUrl = AppConfig.artBaseUrl,
             okHttpClient = null,
             requestHeaders = null
@@ -49,7 +40,7 @@ class ArtDataRepository @Inject constructor(
                         if (o.objectNumber == null) {
                             continue
                         }
-                        val responseDetail = apiDetail.getArtObjectDetail(o.objectNumber, AppConfig.apiKey)
+                        val responseDetail = api.getArtObjectDetail(o.objectNumber, AppConfig.apiKey)
                         if (responseDetail.isSuccessful) {
                             responseDetail.body()?.let { detailFull ->
                                 o.detail = detailFull.artObjectPage
