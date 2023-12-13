@@ -67,7 +67,9 @@ fun ListScreen(
 @Composable
 fun TableItemRow(
     activeRow: Int,
-    item: DataArtElement, index: Int, navController: NavController,
+    item: DataArtElement,
+    index: Int,
+    navController: NavController,
 ) {
     val isPreviousActiveRow = index == activeRow
     Box(
