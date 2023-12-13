@@ -36,7 +36,6 @@ class PersistentDataManager @Inject constructor(
 
     fun saveResponse(url: String, response: Response) {
         try {
-            val h = response.headers.toString()
             response.body?.let { body2 ->
                 val body3 = copyBody(body2, 1000000)
                 body3?.let { body4 ->

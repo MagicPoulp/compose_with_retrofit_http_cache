@@ -4,6 +4,7 @@ import com.example.testcomposethierry.data.config.AppConfig
 import com.example.testcomposethierry.data.custom_structures.ResultOf
 import com.example.testcomposethierry.data.http.ArtApi
 import com.example.testcomposethierry.data.http.RetrofitHelper
+import com.example.testcomposethierry.data.models.DataArtDetail
 import com.example.testcomposethierry.data.models.DataArtElement
 import com.example.testcomposethierry.domain.ExtractDataArtUseCase
 import javax.inject.Inject
@@ -45,15 +46,6 @@ class ArtDataRepository @Inject constructor(
                         if (o.objectNumber == null) {
                             continue
                         }
-                        val responseDetail = api.getArtObjectDetail(o.objectNumber, AppConfig.apiKey)
-                        if (responseDetail.isSuccessful) {
-                            responseDetail.body()?.let { detailFull ->
-                                o.detail = detailFull.artObjectPage
-                            } ?: return ResultOf.Failure(responseDetail.message(), null)
-                        }
-                        else {
-                            return ResultOf.Failure(responseDetail.message(), null)
-                        }
                     }
                     return ResultOf.Success(extractDataArtUseCase(artFull.artObjects))
                 }
@@ -62,5 +54,15 @@ class ArtDataRepository @Inject constructor(
         } catch (e: Exception) {
             return ResultOf.Failure(e.message, e)
         }
+    }
+
+    suspend fun getArtObjectDetail(objectNumber: String): ResultOf<DataArtDetail> {
+        val response = api.getArtObjectDetail(objectNumber, AppConfig.apiKey)
+        if (response.isSuccessful) {
+            response.body()?.artObjectPage?.let { artObjectPage ->
+                return ResultOf.Success(artObjectPage)
+            }
+        }
+        return ResultOf.Failure(response.message(), null)
     }
 }

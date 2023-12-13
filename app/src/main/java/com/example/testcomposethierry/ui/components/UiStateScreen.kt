@@ -34,7 +34,8 @@ fun UiStateScreen(
 ) {
     val unexpectedServerDataErrorString = activity.resources.getString(R.string.unexpected_server_data)
     artViewModel.init(
-        unexpectedServerDataErrorString = unexpectedServerDataErrorString
+        unexpectedServerDataErrorString = unexpectedServerDataErrorString,
+        owner = activity,
     )
     Box(contentAlignment = Alignment.TopCenter,
         modifier = Modifier
@@ -48,7 +49,7 @@ fun UiStateScreen(
             val state by artViewModel.uiState.collectAsStateWithLifecycle()
             val stateListArt = artViewModel.listArt.collectAsLazyPagingItems()
             when (state) {
-                // put all on ErrorScreen() to debug the error screen
+                // put each case here on ErrorScreen() to debug the error screen
                 is UiState.Empty -> ProgressIndicator()
                 UiState.Filled -> NavigationScreen(activity = activity, stateListArt = stateListArt)
                 is UiState.Error -> ErrorScreen(state)
@@ -66,6 +67,12 @@ fun UiStateScreen(
                     if (loadState.append is LoadState.Error) {
                         artViewModel.setUiState(UiState.Error((loadState.append as LoadState.Error).error))
                         return@apply
+                    }
+
+                    // in case of NotLoading, there is no data to fetch
+                    // so when the channel is consumed, we could close it
+                    if (loadState.refresh is LoadState.NotLoading || loadState.append is LoadState.NotLoading) {
+                        artViewModel.closeChannel()
                     }
                 }
             }
