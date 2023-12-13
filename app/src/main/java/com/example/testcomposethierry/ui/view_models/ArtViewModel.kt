@@ -120,10 +120,6 @@ class ArtViewModel @Inject constructor(
         artElementIndexesToProcess.cancel()
     }
 
-    fun closeChannel() {
-        artElementIndexesToProcess.cancel()
-    }
-
     fun getSavedArtDetail(rowId: Int): DataArtDetail? {
         return mapArtDetail[rowId]
     }

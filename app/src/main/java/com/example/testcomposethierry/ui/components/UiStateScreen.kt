@@ -68,12 +68,6 @@ fun UiStateScreen(
                         artViewModel.setUiState(UiState.Error((loadState.append as LoadState.Error).error))
                         return@apply
                     }
-
-                    // in case of NotLoading, there is no data to fetch
-                    // so when the channel is consumed, we could close it
-                    if (loadState.refresh is LoadState.NotLoading || loadState.append is LoadState.NotLoading) {
-                        artViewModel.closeChannel()
-                    }
                 }
             }
 
