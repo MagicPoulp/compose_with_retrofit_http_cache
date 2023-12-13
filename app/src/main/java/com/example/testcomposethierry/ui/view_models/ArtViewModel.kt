@@ -91,13 +91,14 @@ class ArtViewModel @Inject constructor(
         owner.lifecycleScope.launch(Dispatchers.IO) {
             owner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 val receiveFlow = artElementIndexesToProcess.receiveAsFlow()
-                processInParallToGetDetailData(receiveFlow)
+                processInParallelToGetDetailData(receiveFlow)
                 // we do not need to emit and we do not collect the flow for the parallel process
             }
         }
     }
 
-    private fun processInParallToGetDetailData(receiveFlow: Flow<Pair<Int, String>>) {
+    // TOTEST: see the unit test in the test suite
+    private fun processInParallelToGetDetailData(receiveFlow: Flow<Pair<Int, String>>) {
         receiveFlow.flatMapMerge<Pair<Int, String>, Unit>(concurrency = numberOfConcurrentDetailPrefetching) { elementData ->
             flow {
                 // TOTEST: comment this so that there is no prefetching of the detail data
