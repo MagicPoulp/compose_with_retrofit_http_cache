@@ -51,7 +51,7 @@ fun UiStateScreen(
             when (state) {
                 // put each case here on ErrorScreen() to debug the error screen
                 is UiState.Empty -> ProgressIndicator()
-                UiState.Filled -> NavigationScreen(activity = activity, stateListArt = stateListArt)
+                UiState.Filled -> NavigationScreen(activity = activity, stateListArt = stateListArt, artViewModel = artViewModel)
                 is UiState.Error -> ErrorScreen(state)
                 else -> Row {
                     ProgressIndicator()

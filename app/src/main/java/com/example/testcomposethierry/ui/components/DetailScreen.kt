@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import com.example.testcomposethierry.data.models.DataArtElement
@@ -17,18 +18,28 @@ import kotlinx.coroutines.withContext
 fun DetailScreen(
     stateListArt: LazyPagingItems<DataArtElement>,
     rowId: Int,
-    artViewModel: ArtViewModel = hiltViewModel(),
+    artViewModel: ArtViewModel,
 ) {
+    println("DB RENDER °°°")
+    val activeDetailData by artViewModel.activeDetailData.collectAsStateWithLifecycle()
     val artDetail = artViewModel.getSavedArtDetail(rowId)
-    val uiStateDetail by artViewModel.uiStateDetail.collectAsStateWithLifecycle()
-    when (uiStateDetail) {
-        is UiState.Filled ->  artDetail?.plaqueDescription?.let { CenterAlignedText(it) } ?: ProgressIndicator()
-        else -> ProgressIndicator()
+    if (artDetail == null && activeDetailData == null) {
+        CenterAlignedText("NULL")
     }
+    else {
+        activeDetailData?.plaqueDescription?.let { CenterAlignedText(it) } ?: ProgressIndicator()
+    }
+
     LaunchedEffect(Unit) {
-        if (artDetail?.plaqueDescription == null) {
+        println("DB LAUNCH °°°")
+        artDetail?.plaqueDescription?.let {
+            artViewModel.setActiveDetailData(artDetail)
+        } ?: run {
             withContext(Dispatchers.IO) {
-                artViewModel.refetchArtDetail(rowId, stateListArt)
+                //val newDetail = artViewModel.refetchArtDetail(rowId, stateListArt)
+                //newDetail?.let { detail ->
+                //    artViewModel.setActiveDetailData(detail)
+                //}
             }
         }
     }
