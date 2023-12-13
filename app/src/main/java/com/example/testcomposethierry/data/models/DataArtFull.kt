@@ -21,6 +21,7 @@ data class DataArtElement(
     val objectNumber: String?,
     // added by the app from a second API call
     var detail: DataArtDetail?,
+    var excluded: Boolean = false,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
