@@ -6,6 +6,8 @@ import com.example.testcomposethierry.ui.view_models.ArtViewModel
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.AbstractFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -17,6 +19,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
+import java.lang.reflect.Method
 
 
 /*
@@ -38,7 +41,7 @@ class ExampleUnitTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @BeforeEach
-    fun beforeEach() {/*
+    fun beforeEach() {
         // https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-test/MIGRATION.md
         // this dispatcher skips delays
         Dispatchers.setMain(UnconfinedTestDispatcher())
@@ -50,7 +53,7 @@ class ExampleUnitTest {
         //{
            // on { invoke(any()) } doReturn testingPokemonDetails
         //}
-        artViewModel = ArtViewModel(artDataRepository, persistentDataManager)*/
+        artViewModel = ArtViewModel(artDataRepository, persistentDataManager)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -62,13 +65,14 @@ class ExampleUnitTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun testParallelFetchingOfDetailData() = runTest {
-        //val methodToTest = artViewModel.javaClass.getDeclaredMethod("processInParallelToGetDetailData", String::class.java)
-        //methodToTest.isAccessible = true
-        //val receiveFlow: Flow<Pair<Int, String>> = flow {}
-        //val parameters = arrayOfNulls<Any>(1)
-        //parameters[0] = receiveFlow
+        // the types of the method's arguments are needed in the second parameter
+        val methodToTest: Method = artViewModel.javaClass.getDeclaredMethod("consumeChannelAndPrefetchInParallel", Channel::class.java)
+        methodToTest.isAccessible = true
+        val channel = Channel<Pair<Int, String>>(Channel.UNLIMITED)
+        val parameters = arrayOfNulls<Any>(1)
+        parameters[0] = channel
 
-        //methodToTest.invoke(artViewModel, *parameters)
+        methodToTest.invoke(artViewModel, *parameters)
         assertEquals(1, 1)
         /*
         pokeViewModel.pokemonList.test { // test is needed with turbine
