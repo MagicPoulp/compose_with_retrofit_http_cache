@@ -93,6 +93,7 @@ class ArtViewModel @Inject constructor(
             owner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 val receiveFlow = artElementIndexesToProcess.receiveAsFlow()
                 processInParallelToGetDetailData(receiveFlow)
+                    // a cold flow is not executed without a collector
                     .collect()
             }
         }
@@ -106,6 +107,7 @@ class ArtViewModel @Inject constructor(
                 println("DB Start Parallel")
                 // TOTEST: comment this so that there is no prefetching of the detail data
                 // data is refetched when clicking on a row
+                /*
                 when (val resultDetail = artDataRepository.getArtObjectDetail(elementData.second)) {
                     is ResultOf.Success -> mapArtDetail.getOrPut(elementData.first) {
                         println("DB put from parallel prefetch " + elementData.first)
@@ -116,7 +118,7 @@ class ArtViewModel @Inject constructor(
                         resultDetail.value
                     }
                     else -> Unit
-                }
+                }*/
                 println("DB TEST " + mapArtDetail[elementData.first])
             }
         }

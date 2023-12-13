@@ -16,6 +16,7 @@ import kotlinx.coroutines.withContext
 
 @Composable
 fun DetailScreen(
+    stateListArt: LazyPagingItems<DataArtElement>,
     rowId: Int,
     artViewModel: ArtViewModel,
 ) {
@@ -36,10 +37,10 @@ fun DetailScreen(
             artViewModel.setActiveDetailData(artDetail)
         } ?: run {
             withContext(Dispatchers.IO) {
-                //val newDetail = artViewModel.refetchArtDetail(rowId, stateListArt)
-                //newDetail?.let { detail ->
-                //    artViewModel.setActiveDetailData(detail)
-                //}
+                val newDetail = artViewModel.refetchArtDetail(rowId, stateListArt)
+                newDetail?.let { detail ->
+                    artViewModel.setActiveDetailData(detail)
+                }
             }
         }
     }
