@@ -1,19 +1,31 @@
 package com.example.testcomposethierry
 
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.testing.TestLifecycleOwner
+import app.cash.turbine.test
 import com.example.testcomposethierry.data.repositories.ArtDataRepository
 import com.example.testcomposethierry.data.repositories.PersistentDataManager
 import com.example.testcomposethierry.ui.view_models.ArtViewModel
 import dagger.hilt.android.testing.HiltAndroidTest
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.AbstractFlow
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -62,9 +74,9 @@ class ExampleUnitTest {
         Dispatchers.resetMain()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun testParallelFetchingOfDetailData() = runTest {
+        // we use getDeclaredMethod to access a private method
         // the types of the method's arguments are needed in the second parameter
         val methodToTest: Method = artViewModel.javaClass.getDeclaredMethod("consumeChannelAndPrefetchInParallel", Channel::class.java)
         methodToTest.isAccessible = true
@@ -72,30 +84,42 @@ class ExampleUnitTest {
         val parameters = arrayOfNulls<Any>(1)
         parameters[0] = channel
 
-        methodToTest.invoke(artViewModel, *parameters)
-        assertEquals(1, 1)
-        /*
-        pokeViewModel.pokemonList.test { // test is needed with turbine
-            val actual = mutableListOf<ResultOf<List<PokemonDetails>>>()
-            val testLifecycleOwner = TestLifecycleOwner()
+        // input data
+        val channelInputList = listOf(Pair(1, "ObjectNumber1"), Pair(2, "ObjectNumber2"), Pair(3, "ObjectNumber3"))
+
+        // testLifecycleOwner starts on the state STARTED
+        val testLifecycleOwner = TestLifecycleOwner()
+        @Suppress("UNCHECKED_CAST")
+        val methodResult: Flow<Unit> = methodToTest.invoke(artViewModel, *parameters) as Flow<Unit>
+        // the command below is needed to activate turbine on methodResult's flow
+        methodResult.test {
+            var numCollect = 0
             testLifecycleOwner.lifecycleScope.launch {
                 testLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    pokeViewModel.pokemonList.collect {
-                        actual.add(it)
+                    methodResult.collect {
+                        numCollect += 1
                     }
                 }
             }
-            // currentState is STARTED by default
-            //println(testLifecycleOwner.currentState)
-            //testLifecycleOwner.currentState = Lifecycle.State.STARTED
-            // we must wait for 2 items because the coroutine is waiting on the collec
-            // and the library turbine helps a lot for that using awaitItem()
-            awaitItem()
-            awaitItem()
-            assertThat("number of values", actual.size, equalTo(2))
-            assertThat("Loading value", actual[0], equalTo(ResultOf.Loading("")))
-            assertThat("Success value", actual[1], equalTo(ResultOf.Success(testingPokemonDetails)))
+            var numSend = 0
+            for (channelInput in channelInputList) {
+                numSend += 1
+                channel.send(channelInput)
+            }
+            var numAwaitItem = 0
+            // it seems that a collect will remove one awaitItem, hence we subtract numCollect
+            for (i in (channelInputList.indices - numCollect)) {
+                // awaitItem waits for an emit on methodResult
+                awaitItem()
+                numAwaitItem += 1
+            }
+            // this ensures we that have treated all the emit() events
+            ensureAllEventsConsumed()
+            // we do not awaitComplete() because the flow is still alive receiving on the channel
+            assertThat("channel sent value", numSend, equalTo(channelInputList.size))
+            assertThat("num send compared to num awaitItem", numSend, equalTo(numAwaitItem + numCollect))
         }
-        */
+        // putting this or removing it shows that a lifecycle change cleans up correctly the coroutines
+        testLifecycleOwner.currentState = Lifecycle.State.DESTROYED
     }
 }
