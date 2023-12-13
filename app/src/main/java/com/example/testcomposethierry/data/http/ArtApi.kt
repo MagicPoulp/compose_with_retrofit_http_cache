@@ -9,6 +9,8 @@ import retrofit2.http.Query
 
 // Retrofit interface
 
+// doc:
+// https://data.rijksmuseum.nl/object-metadata/api/
 interface ArtApi {
     @GET("/api/en/collection")
     suspend fun getArtPaged(@Query("key") key: String, @Query("ps") pageSize: Int, @Query("p") pageOffset: Int): Response<DataArtFull>

@@ -21,10 +21,13 @@ class ArtDataPagingSource (
         val pagingSize = AppConfig.pagingSize
         return when (val response = artDataRepository.getArtPaged(pagingSize, nextPageNumber)) {
             is ResultOf.Success -> if (response.value.isEmpty()) LoadResult.Error(Exception(unexpectedServerDataErrorString)) else {
-                response.value.forEachIndexed  { index, v ->
+                /*
+                // commented because the sending to the Channel to fetch the detail data was moved to the ViewModel,
+                // After filtering the duplicates. It is important to have a correct index
+                response.value.forEachIndexed { index, v ->
                     val elementGlobalIndex = index + pagingSize * nextPageNumber
                     v.objectNumber?.let { artElementIndexesToProcess.send(Pair(elementGlobalIndex, v.objectNumber)) }
-                }
+                }*/
                 LoadResult.Page(
                     data = response.value,
                     prevKey = if (nextPageNumber > 1) nextPageNumber - 1 else null,
