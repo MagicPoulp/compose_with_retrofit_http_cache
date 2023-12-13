@@ -92,8 +92,15 @@ class ArtViewModel @Inject constructor(
                 val receiveFlow = artElementIndexesToProcess.receiveAsFlow()
                 receiveFlow.flatMapMerge<Pair<Int, String>, Unit>(concurrency = 10) { elementData ->
                     flow {
+                        // TOTEST: comment this so that there is no prefetching of the detail data
+                        // data is refetched when clicking on a row
                         when (val resultDetail = artDataRepository.getArtObjectDetail(elementData.second)) {
-                            //is ResultOf.Success -> mapArtDetail.getOrPut(elementData.first) { resultDetail.value }
+                            is ResultOf.Success -> mapArtDetail.getOrPut(elementData.first) {
+                                if (activeRow.value == elementData.first) {
+                                    setUiStateDetail(UiState.Filled)
+                                }
+                                resultDetail.value
+                            }
                             else -> Unit
                         }
                     }
