@@ -20,7 +20,6 @@ fun DetailScreen(
     rowId: Int,
     artViewModel: ArtViewModel,
 ) {
-    println("DB RENDER °°°")
     val activeDetailData by artViewModel.activeDetailData.collectAsStateWithLifecycle()
     when (activeDetailData) {
         null -> ProgressIndicator()
@@ -29,7 +28,6 @@ fun DetailScreen(
     }
 
     LaunchedEffect(Unit) {
-        println("DB LAUNCH °°°")
         // initially the activeDetailData can be undefined
         // but we can check the real data and update activeDetailData
         val artDetail = artViewModel.getSavedArtDetail(rowId)

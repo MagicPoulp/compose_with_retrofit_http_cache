@@ -78,7 +78,6 @@ class ArtViewModel @Inject constructor(
         if (initialized) {
             return
         }
-        println("DB INIT")
         initialized = true
 
         // one can add a RemoteMediator for caching
@@ -101,25 +100,20 @@ class ArtViewModel @Inject constructor(
 
     // TOTEST: see the unit test in the test suite
     @OptIn(ExperimentalCoroutinesApi::class)
-    private suspend fun processInParallelToGetDetailData(receiveFlow: Flow<Pair<Int, String>>): Flow<Unit> {
+    private fun processInParallelToGetDetailData(receiveFlow: Flow<Pair<Int, String>>): Flow<Unit> {
         return receiveFlow.flatMapMerge<Pair<Int, String>, Unit>(concurrency = numberOfConcurrentDetailPrefetching) { elementData ->
             flow {
-                println("DB Start Parallel")
                 // TOTEST: comment this so that there is no prefetching of the detail data
                 // data is refetched when clicking on a row
-                /*
                 when (val resultDetail = artDataRepository.getArtObjectDetail(elementData.second)) {
                     is ResultOf.Success -> mapArtDetail.getOrPut(elementData.first) {
-                        println("DB put from parallel prefetch " + elementData.first)
                         if (activeRow.value == elementData.first) {
-                            println("°°°°°°°°°°>>>>>>>>>>>> HERE")
                             setActiveDetailData(resultDetail.value)
                         }
                         resultDetail.value
                     }
                     else -> Unit
-                }*/
-                println("DB TEST " + mapArtDetail[elementData.first])
+                }
             }
         }
     }
@@ -152,8 +146,6 @@ class ArtViewModel @Inject constructor(
     }
 
     fun getSavedArtDetail(rowId: Int): DataArtDetail? {
-        println("DB get size " + mapArtDetail.size)
-        println("DB get " + rowId + ", " + mapArtDetail[rowId])
         return mapArtDetail[rowId]
     }
 
