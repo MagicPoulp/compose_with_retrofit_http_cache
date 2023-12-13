@@ -27,7 +27,10 @@ import androidx.paging.compose.LazyPagingItems
 import com.example.testcomposethierry.data.models.DataArtElement
 import com.example.testcomposethierry.ui.setup.RoutingScreen
 import com.example.testcomposethierry.ui.view_models.ArtViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
@@ -37,6 +40,15 @@ fun NavigationScreen(
     artViewModel: ArtViewModel,
 ) {
     val navController = rememberNavController()
+    navController.addOnDestinationChangedListener { controller, destination, args ->
+        CoroutineScope(Dispatchers.IO).launch {
+            // needed to avoid seeing the old text in the Detail Screen
+            // but we cannot set null when navigating to the Detail screen or it interfers with the data
+            if (destination.route != RoutingScreen.MyDetailScreen.route) {
+                artViewModel.setActiveDetailData(null)
+            }
+        }
+    }
     val items = listOf(
         RoutingScreen.MyListScreen,
         RoutingScreen.MyDetailScreen,
