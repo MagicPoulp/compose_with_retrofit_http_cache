@@ -131,12 +131,16 @@ class ArtViewModel @Inject constructor(
         // it does not matter if we drop certain elements, because we refetch details if we click
         owner.lifecycleScope.launch(Dispatchers.IO) {
             owner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                val receiveFlow = artElementIndexesToProcess.receiveAsFlow()
-                processInParallelToGetDetailData(receiveFlow)
+                consumeChannelAndPrefetchInParallel(artElementIndexesToProcess)
                     // a cold flow is not executed without a collector
                     .collect()
             }
         }
+    }
+
+    private fun consumeChannelAndPrefetchInParallel(channel: Channel<Pair<Int, String>>): Flow<Unit> {
+        val receiveFlow = channel.receiveAsFlow()
+        return processInParallelToGetDetailData(receiveFlow)
     }
 
     // TOTEST: see the unit test in the test suite
