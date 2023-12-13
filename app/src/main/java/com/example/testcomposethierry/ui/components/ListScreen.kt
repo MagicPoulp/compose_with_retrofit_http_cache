@@ -69,7 +69,6 @@ fun TableItemRow(
     activeRow: Int,
     item: DataArtElement, index: Int, navController: NavController,
 ) {
-    //val activeRow = artViewModel.activeRow.collectAsStateWithLifecycle()
     val isPreviousActiveRow = index == activeRow
     Box(
         modifier = Modifier
