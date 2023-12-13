@@ -41,7 +41,7 @@ fun NavigationScreen(
         RoutingScreen.MyListScreen,
         RoutingScreen.MyDetailScreen,
     )
-    val activeRow = artViewModel.activeRow.collectAsStateWithLifecycle()
+    val activeRow by artViewModel.activeRow.collectAsStateWithLifecycle()
     Scaffold(
         backgroundColor = MaterialTheme.colors.secondary,
         bottomBar = {
@@ -87,7 +87,7 @@ fun NavigationScreen(
         ) {
             composable(RoutingScreen.MyListScreen.route) {
                 ListScreen(
-                    activeRow = activeRow.value,
+                    activeRow = activeRow,
                     stateListArt = stateListArt,
                     navController = navController,
 
@@ -96,16 +96,16 @@ fun NavigationScreen(
             // anomaly: as reported in this stack overflow, navigating, recomposes twice
             // https://stackoverflow.com/questions/69190119/jetpack-compose-recompose-with-success-state-twice-when-exiting-current-composab?noredirect=1&lq=1
             composable(RoutingScreen.MyDetailScreen.route) { backStackEntry ->
-                val previousRow = if (activeRow.value != -1) activeRow.value else 0
+                val previousRow = if (activeRow != -1) activeRow else 0
                 val rowId = try {
                     backStackEntry.arguments?.getString("rowId")?.toInt() ?: previousRow
                 } catch (_: Exception) {
                     previousRow
                 }
-                DetailScreen(rowId = rowId)
+                DetailScreen(stateListArt = stateListArt, rowId = rowId)
                 LaunchedEffect(Unit) {
                     delay(300.milliseconds)
-                    if (rowId != activeRow.value) {
+                    if (rowId != activeRow) {
                         artViewModel.setActiveRow(owner = activity, rowId = rowId)
                     }
                 }
