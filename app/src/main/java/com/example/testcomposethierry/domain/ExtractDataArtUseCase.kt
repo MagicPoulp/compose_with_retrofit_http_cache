@@ -6,6 +6,6 @@ import javax.inject.Inject
 
 class ExtractDataArtUseCase @Inject constructor() {
     operator fun invoke(artObjects: List<DataArtElement>): List<DataArtElement> {
-        return artObjects.filter { it2 -> it2.title != null && it2.objectNumber != null }
+        return artObjects.filter { it -> it.title != null && it.objectNumber != null }
     }
 }

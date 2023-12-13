@@ -62,7 +62,7 @@ class ExampleUnitTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun testGetPokemon() = runTest {
+    fun testParallelFetchingOfDetailData() = runTest {
         val methodToTest = artViewModel.javaClass.getDeclaredMethod("processInParallelToGetDetailData", String::class.java)
         methodToTest.isAccessible = true
         val receiveFlow: Flow<Pair<Int, String>> = flow {}

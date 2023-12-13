@@ -6,10 +6,14 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import androidx.paging.compose.LazyPagingItems
+import androidx.paging.filter
+import androidx.paging.map
 import com.example.testcomposethierry.BuildConfig
 import com.example.testcomposethierry.data.config.AppConfig
 import com.example.testcomposethierry.data.custom_structures.ResultOf
@@ -29,6 +33,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -98,6 +103,29 @@ class ArtViewModel @Inject constructor(
         listArt = Pager(PagingConfig(pageSize = AppConfig.pagingSize)) {
             ArtDataPagingSource(unexpectedServerDataErrorString, artDataRepository, artElementIndexesToProcess)
         }.flow
+            .map { pagingData ->
+                // This filtering is optional, it is just because the API send us duplicates.
+                // We filter duplicate object numbers.
+                // https://stackoverflow.com/questions/69284841/how-to-avoid-duplicate-items-in-pagingadapter
+                // The museum API has a bug since duplicate pages can be returned
+                // the 2 following calls give duplicates, and then the next pages are totally distinct
+                // curl https://www.rijksmuseum.nl/api/en/collection?key=rIl6yb6x\&ps=3\&p=0
+                // curl https://www.rijksmuseum.nl/api/en/collection?key=rIl6yb6x\&ps=3\&p=1
+                val objectNumbersHashSet = hashSetOf<String>()
+                val pagingDataWithoutDuplicates = pagingData.filter { elem ->
+                    elem.objectNumber?.let { objectNumbersHashSet.add(elem.objectNumber) } ?: false
+                }
+                var itemIndex = -1
+                pagingDataWithoutDuplicates.map { elem ->
+                    itemIndex += 1
+                    elem.objectNumber?.let {
+                        // We send to the Channel the IDs that need to be prefetched for getting the detail data
+                        artElementIndexesToProcess.send(Pair(itemIndex, elem.objectNumber))
+                    }
+                    elem
+                }
+            }
+            .cachedIn(viewModelScope)
 
         // the repeatOnLifecycle is here to stop consuming resources when the app goes in background
         // it does not matter if we drop certain elements, because we refetch details if we click
