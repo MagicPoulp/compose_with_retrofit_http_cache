@@ -1,4 +1,4 @@
-package com.example.testComposethierry.ui.setup
+package com.example.testcomposethierry.ui.setup
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

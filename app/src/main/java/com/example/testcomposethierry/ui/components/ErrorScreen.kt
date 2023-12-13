@@ -1,4 +1,4 @@
-package com.example.testComposethierry.ui.components
+package com.example.testcomposethierry.ui.components
 
 import android.content.ComponentName
 import android.content.Intent
@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.testComposethierry.ui.view_models.UiState
+import com.example.testcomposethierry.ui.view_models.UiState
 
 // layout from https://stackoverflow.com/questions/63719072/jetpack-compose-centering-text
 @Composable

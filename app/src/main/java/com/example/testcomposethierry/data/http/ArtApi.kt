@@ -1,7 +1,7 @@
-package com.example.testComposethierry.data.http
+package com.example.testcomposethierry.data.http
 
-import com.example.testComposethierry.data.models.DataArtDetailFull
-import com.example.testComposethierry.data.models.DataArtFull
+import com.example.testcomposethierry.data.models.DataArtDetailFull
+import com.example.testcomposethierry.data.models.DataArtFull
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path

@@ -1,4 +1,4 @@
-package com.example.testComposethierry
+package com.example.testcomposethierry
 
 import org.junit.Test
 

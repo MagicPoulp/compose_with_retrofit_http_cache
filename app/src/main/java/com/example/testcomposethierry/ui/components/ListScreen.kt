@@ -1,4 +1,4 @@
-package com.example.testComposethierry.ui.components
+package com.example.testcomposethierry.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,9 +22,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.paging.compose.LazyPagingItems
-import com.example.testComposethierry.data.models.DataArtElement
-import com.example.testComposethierry.ui.reusable_components.LeftAlignedText
-import com.example.testComposethierry.ui.setup.RoutingScreen
+import com.example.testcomposethierry.data.models.DataArtElement
+import com.example.testcomposethierry.ui.reusable_components.LeftAlignedText
+import com.example.testcomposethierry.ui.setup.RoutingScreen
 
 val horizontalMargin = 20.dp
 val rowHeight = 60.dp

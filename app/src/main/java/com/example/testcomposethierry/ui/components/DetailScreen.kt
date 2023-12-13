@@ -1,4 +1,4 @@
-package com.example.testComposethierry.ui.components
+package com.example.testcomposethierry.ui.components
 
 import android.view.ViewGroup
 import android.webkit.WebView
@@ -6,8 +6,8 @@ import android.webkit.WebViewClient
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.paging.compose.LazyPagingItems
-import com.example.testComposethierry.data.models.DataArtElement
-import com.example.testComposethierry.ui.reusable_components.CenterAlignedText
+import com.example.testcomposethierry.data.models.DataArtElement
+import com.example.testcomposethierry.ui.reusable_components.CenterAlignedText
 
 @Composable
 fun DetailScreen(

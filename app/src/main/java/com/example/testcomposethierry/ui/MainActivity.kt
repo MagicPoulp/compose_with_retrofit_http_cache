@@ -1,10 +1,10 @@
-package com.example.testComposethierry.ui
+package com.example.testcomposethierry.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.example.testComposethierry.ui.components.UiStateScreen
-import com.example.testComposethierry.ui.theme.TestComposeThierryTheme
+import com.example.testcomposethierry.ui.components.UiStateScreen
+import com.example.testcomposethierry.ui.theme.TestComposeThierryTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

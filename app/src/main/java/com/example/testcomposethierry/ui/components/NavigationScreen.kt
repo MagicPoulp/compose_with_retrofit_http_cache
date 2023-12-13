@@ -1,4 +1,4 @@
-package com.example.testComposethierry.ui.components
+package com.example.testcomposethierry.ui.components
 
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.padding
@@ -24,9 +24,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.paging.compose.LazyPagingItems
-import com.example.testComposethierry.data.models.DataArtElement
-import com.example.testComposethierry.ui.setup.RoutingScreen
-import com.example.testComposethierry.ui.view_models.ArtViewModel
+import com.example.testcomposethierry.data.models.DataArtElement
+import com.example.testcomposethierry.ui.setup.RoutingScreen
+import com.example.testcomposethierry.ui.view_models.ArtViewModel
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 

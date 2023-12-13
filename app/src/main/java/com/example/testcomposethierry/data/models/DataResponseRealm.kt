@@ -1,4 +1,4 @@
-package com.example.testComposethierry.data.models
+package com.example.testcomposethierry.data.models
 
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey

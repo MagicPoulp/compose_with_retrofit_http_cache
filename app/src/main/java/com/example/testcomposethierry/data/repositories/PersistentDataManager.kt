@@ -1,6 +1,6 @@
-package com.example.testComposethierry.data.repositories
+package com.example.testcomposethierry.data.repositories
 
-import com.example.testComposethierry.data.models.DataResponseRealm
+import com.example.testcomposethierry.data.models.DataResponseRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.UpdatePolicy

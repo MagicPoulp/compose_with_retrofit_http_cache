@@ -1,4 +1,4 @@
-package com.example.testComposethierry.ui.view_models
+package com.example.testcomposethierry.ui.view_models
 
 
 import androidx.lifecycle.LifecycleOwner
@@ -7,12 +7,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import com.example.testComposethierry.BuildConfig
-import com.example.testComposethierry.data.config.AppConfig
-import com.example.testComposethierry.data.models.DataArtElement
-import com.example.testComposethierry.data.repositories.ArtDataRepository
-import com.example.testComposethierry.data.repositories.ArtDataPagingSource
-import com.example.testComposethierry.data.repositories.PersistentDataManager
+import com.example.testcomposethierry.BuildConfig
+import com.example.testcomposethierry.data.config.AppConfig
+import com.example.testcomposethierry.data.models.DataArtElement
+import com.example.testcomposethierry.data.repositories.ArtDataRepository
+import com.example.testcomposethierry.data.repositories.ArtDataPagingSource
+import com.example.testcomposethierry.data.repositories.PersistentDataManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
