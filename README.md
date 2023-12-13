@@ -2,8 +2,6 @@
 
 Thierry Vilmart
 
-#Date
-
 December 2023
 
 # Summary
