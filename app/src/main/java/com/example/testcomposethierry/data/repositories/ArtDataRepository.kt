@@ -57,6 +57,10 @@ class ArtDataRepository @Inject constructor(
     }
 
     suspend fun getArtObjectDetail(objectNumber: String): ResultOf<DataArtDetail> {
+        if (!initialized) {
+            initialized = true
+            createApi()
+        }
         val response = api.getArtObjectDetail(objectNumber, AppConfig.apiKey)
         if (response.isSuccessful) {
             response.body()?.artObjectPage?.let { artObjectPage ->

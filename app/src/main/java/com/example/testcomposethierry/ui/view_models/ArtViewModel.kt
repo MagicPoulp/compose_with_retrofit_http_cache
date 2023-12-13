@@ -9,6 +9,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
 import com.example.testcomposethierry.BuildConfig
 import com.example.testcomposethierry.data.config.AppConfig
 import com.example.testcomposethierry.data.custom_structures.ResultOf
@@ -56,6 +57,9 @@ class ArtViewModel @Inject constructor(
     private val _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState.Empty)
     val uiState: StateFlow<UiState>
         get() = _uiState.asStateFlow()
+    private val _uiStateDetail: MutableStateFlow<UiState> = MutableStateFlow(UiState.Empty)
+    val uiStateDetail: StateFlow<UiState>
+        get() = _uiStateDetail.asStateFlow()
     private val _activeRow: MutableStateFlow<Int> = MutableStateFlow(-1)
     val activeRow: StateFlow<Int>
         get() = _activeRow.asStateFlow()
@@ -114,6 +118,15 @@ class ArtViewModel @Inject constructor(
         }
     }
 
+    suspend fun setUiStateDetail(newUiState: UiState) {
+        if (BuildConfig.DEBUG && newUiState is UiState.Error) {
+            println(newUiState.error.message)
+        }
+        if (newUiState != _uiStateDetail) {
+            _uiStateDetail.emit(newUiState)
+        }
+    }
+
     override fun onCleared() {
         super.onCleared()
         persistentDataManager.close()
@@ -122,5 +135,20 @@ class ArtViewModel @Inject constructor(
 
     fun getSavedArtDetail(rowId: Int): DataArtDetail? {
         return mapArtDetail[rowId]
+    }
+
+    suspend fun refetchArtDetail(rowId: Int, stateListArt: LazyPagingItems<DataArtElement>) {
+        val itemData = stateListArt.itemSnapshotList[rowId]
+        itemData?.objectNumber?.let { objectNumber ->
+            when (val resultDetail = artDataRepository.getArtObjectDetail(objectNumber)) {
+                is ResultOf.Success -> {
+                    mapArtDetail.getOrPut(rowId) {
+                        setUiStateDetail(UiState.Filled)
+                        resultDetail.value
+                    }
+                }
+                else -> Unit
+            }
+        }
     }
 }
