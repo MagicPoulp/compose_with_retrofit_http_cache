@@ -1,3 +1,6 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
@@ -109,9 +112,10 @@ dependencies {
     // -------------------------------------------------------------
     // testing
 
-    // For DI in the tests
-    testImplementation("com.google.dagger:hilt-android-testing:2.44.2")
-    kaptTest("com.google.dagger:hilt-compiler:2.44.2")
+    // For DI with Hilt in the local unit tests
+    // https://developer.android.com/training/dependency-injection/hilt-testing
+    testImplementation("com.google.dagger:hilt-android-testing:2.47")
+    kaptTest("com.google.dagger:hilt-compiler:2.47")
 
     //test libs
     // Kotlin extensions for androidx.test.core
@@ -140,8 +144,36 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.1")
     //testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.8.2")
+    /*
+    // Jupiter also needs useJUnitPlatform() as follows
+    // tasks.withType<Test>().configureEach { // for .kts, and setOf() for testLogging
+    tasks.withType(Test).configureEach {
+        useJUnitPlatform()
+        testLogging {
+            exceptionFormat = TestExceptionFormat.FULL
+            events TestLogEvent.FAILED,
+                   TestLogEvent.PASSED,
+                   TestLogEvent.SKIPPED,
+                   TestLogEvent.STANDARD_OUT
+            showStandardStreams = true
+        }
+    }
+    */
+
 
     // mockk has every ... getProperty to test private members
     //testImplementation "io.mockk:mockk-android:1.13.1"
     //testImplementation "io.mockk:mockk-agent:1.13.1"
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+    testLogging {
+        exceptionFormat = TestExceptionFormat.FULL
+        events TestLogEvent.FAILED,
+               TestLogEvent.PASSED,
+               TestLogEvent.SKIPPED,
+               TestLogEvent.STANDARD_OUT
+        showStandardStreams = true
+    }
 }
