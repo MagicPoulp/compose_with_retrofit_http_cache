@@ -7,12 +7,13 @@ plugins {
 }
 
 android {
-    compileSdk 34
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.example.testcomposethierry"
         minSdk 21
-        targetSdk 34
+        // not 34 the latest because it is synced with the gradle version, as said in the console when running tests
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
