@@ -67,6 +67,7 @@ class ArtViewModel @Inject constructor(
     // there is no reason to limit the size of the channel, because we consume it on a limited number of tasks
     // limiting this size, could theoretically block the repository function that sends.
     private val artElementIndexesToProcess = Channel<Pair<Int, String>>(Channel.UNLIMITED)
+    private val numberOfConcurrentDetailPrefetching = 10
 
     // ------------------------------------------
     // init variables
@@ -90,22 +91,26 @@ class ArtViewModel @Inject constructor(
         owner.lifecycleScope.launch(Dispatchers.IO) {
             owner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 val receiveFlow = artElementIndexesToProcess.receiveAsFlow()
-                receiveFlow.flatMapMerge<Pair<Int, String>, Unit>(concurrency = 10) { elementData ->
-                    flow {
-                        // TOTEST: comment this so that there is no prefetching of the detail data
-                        // data is refetched when clicking on a row
-                        when (val resultDetail = artDataRepository.getArtObjectDetail(elementData.second)) {
-                            is ResultOf.Success -> mapArtDetail.getOrPut(elementData.first) {
-                                if (activeRow.value == elementData.first) {
-                                    setUiStateDetail(UiState.Filled)
-                                }
-                                resultDetail.value
-                            }
-                            else -> Unit
+                processInParallToGetDetailData(receiveFlow)
+                // we do not need to emit and we do not collect the flow for the parallel process
+            }
+        }
+    }
+
+    private fun processInParallToGetDetailData(receiveFlow: Flow<Pair<Int, String>>) {
+        receiveFlow.flatMapMerge<Pair<Int, String>, Unit>(concurrency = numberOfConcurrentDetailPrefetching) { elementData ->
+            flow {
+                // TOTEST: comment this so that there is no prefetching of the detail data
+                // data is refetched when clicking on a row
+                when (val resultDetail = artDataRepository.getArtObjectDetail(elementData.second)) {
+                    is ResultOf.Success -> mapArtDetail.getOrPut(elementData.first) {
+                        if (activeRow.value == elementData.first) {
+                            setUiStateDetail(UiState.Filled)
                         }
+                        resultDetail.value
                     }
+                    else -> Unit
                 }
-                // we do not emit and we do not collect the flow above
             }
         }
     }
@@ -125,7 +130,7 @@ class ArtViewModel @Inject constructor(
         }
     }
 
-    suspend fun setUiStateDetail(newUiState: UiState) {
+    private suspend fun setUiStateDetail(newUiState: UiState) {
         if (BuildConfig.DEBUG && newUiState is UiState.Error) {
             println(newUiState.error.message)
         }
