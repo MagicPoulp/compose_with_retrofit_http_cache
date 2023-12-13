@@ -49,7 +49,7 @@ class ArtViewModel @Inject constructor(
     // user data variables
     // the list of packages installed on the device
     lateinit var listArt: Flow<PagingData<DataArtElement>>
-    val mapArtDetail: MutableMap<Int, DataArtDetail> = hashMapOf()
+    private val mapArtDetail: MutableMap<Int, DataArtDetail> = hashMapOf()
 
     // ------------------------------------------
     // UI state variables
@@ -57,12 +57,12 @@ class ArtViewModel @Inject constructor(
     private val _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState.Empty)
     val uiState: StateFlow<UiState>
         get() = _uiState.asStateFlow()
-    private val _uiStateDetail: MutableStateFlow<UiState> = MutableStateFlow(UiState.Empty)
-    val uiStateDetail: StateFlow<UiState>
-        get() = _uiStateDetail.asStateFlow()
     private val _activeRow: MutableStateFlow<Int> = MutableStateFlow(-1)
     val activeRow: StateFlow<Int>
         get() = _activeRow.asStateFlow()
+    private val _activeDetailData: MutableStateFlow<DataArtDetail?> = MutableStateFlow(null)
+    val activeDetailData: StateFlow<DataArtDetail?>
+        get() = _activeDetailData.asStateFlow()
     // unbuffered channel, needed for concurrency data
     // there is no reason to limit the size of the channel, because we consume it on a limited number of tasks
     // limiting this size, could theoretically block the repository function that sends.
@@ -78,6 +78,7 @@ class ArtViewModel @Inject constructor(
         if (initialized) {
             return
         }
+        println("DB INIT")
         initialized = true
 
         // one can add a RemoteMediator for caching
@@ -92,26 +93,31 @@ class ArtViewModel @Inject constructor(
             owner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 val receiveFlow = artElementIndexesToProcess.receiveAsFlow()
                 processInParallelToGetDetailData(receiveFlow)
-                // we do not need to emit and we do not collect the flow for the parallel process
+                    .collect()
             }
         }
     }
 
     // TOTEST: see the unit test in the test suite
-    private fun processInParallelToGetDetailData(receiveFlow: Flow<Pair<Int, String>>) {
-        receiveFlow.flatMapMerge<Pair<Int, String>, Unit>(concurrency = numberOfConcurrentDetailPrefetching) { elementData ->
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private suspend fun processInParallelToGetDetailData(receiveFlow: Flow<Pair<Int, String>>): Flow<Unit> {
+        return receiveFlow.flatMapMerge<Pair<Int, String>, Unit>(concurrency = numberOfConcurrentDetailPrefetching) { elementData ->
             flow {
+                println("DB Start Parallel")
                 // TOTEST: comment this so that there is no prefetching of the detail data
                 // data is refetched when clicking on a row
                 when (val resultDetail = artDataRepository.getArtObjectDetail(elementData.second)) {
                     is ResultOf.Success -> mapArtDetail.getOrPut(elementData.first) {
+                        println("DB put from parallel prefetch " + elementData.first)
                         if (activeRow.value == elementData.first) {
-                            setUiStateDetail(UiState.Filled)
+                            println("°°°°°°°°°°>>>>>>>>>>>> HERE")
+                            setActiveDetailData(resultDetail.value)
                         }
                         resultDetail.value
                     }
                     else -> Unit
                 }
+                println("DB TEST " + mapArtDetail[elementData.first])
             }
         }
     }
@@ -131,12 +137,9 @@ class ArtViewModel @Inject constructor(
         }
     }
 
-    private suspend fun setUiStateDetail(newUiState: UiState) {
-        if (BuildConfig.DEBUG && newUiState is UiState.Error) {
-            println(newUiState.error.message)
-        }
-        if (newUiState != _uiStateDetail) {
-            _uiStateDetail.emit(newUiState)
+    suspend fun setActiveDetailData(newActiveDetailData: DataArtDetail?) {
+        if (newActiveDetailData != _activeDetailData.value) {
+            _activeDetailData.emit(newActiveDetailData)
         }
     }
 
@@ -147,21 +150,25 @@ class ArtViewModel @Inject constructor(
     }
 
     fun getSavedArtDetail(rowId: Int): DataArtDetail? {
+        println("DB get size " + mapArtDetail.size)
+        println("DB get " + rowId + ", " + mapArtDetail[rowId])
         return mapArtDetail[rowId]
     }
 
-    suspend fun refetchArtDetail(rowId: Int, stateListArt: LazyPagingItems<DataArtElement>) {
+    suspend fun refetchArtDetail(rowId: Int, stateListArt: LazyPagingItems<DataArtElement>): DataArtDetail? {
         val itemData = stateListArt.itemSnapshotList[rowId]
         itemData?.objectNumber?.let { objectNumber ->
             when (val resultDetail = artDataRepository.getArtObjectDetail(objectNumber)) {
                 is ResultOf.Success -> {
                     mapArtDetail.getOrPut(rowId) {
-                        setUiStateDetail(UiState.Filled)
+                        setActiveDetailData(resultDetail.value)
                         resultDetail.value
                     }
+                    return resultDetail.value
                 }
                 else -> Unit
             }
         }
+        return null
     }
 }

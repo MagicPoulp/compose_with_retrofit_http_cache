@@ -68,7 +68,7 @@ class RetrofitHelper @Inject constructor(
             }
             response
             // TOTEST: to develop without using the server, use this
-            // persistentDataManager.loadResponse(request.url.toString(), request, response)
+            persistentDataManager.loadResponse(request.url.toString(), request, response)
         })
 
         requestHeaders?.let {

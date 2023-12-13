@@ -34,7 +34,7 @@ import kotlin.time.Duration.Companion.milliseconds
 fun NavigationScreen(
     activity: ComponentActivity,
     stateListArt: LazyPagingItems<DataArtElement>,
-    artViewModel: ArtViewModel = hiltViewModel(),
+    artViewModel: ArtViewModel,
 ) {
     val navController = rememberNavController()
     val items = listOf(
@@ -102,7 +102,7 @@ fun NavigationScreen(
                 } catch (_: Exception) {
                     previousRow
                 }
-                DetailScreen(stateListArt = stateListArt, rowId = rowId)
+                DetailScreen(stateListArt = stateListArt, rowId = rowId, artViewModel = artViewModel)
                 LaunchedEffect(Unit) {
                     delay(300.milliseconds)
                     if (rowId != activeRow) {
