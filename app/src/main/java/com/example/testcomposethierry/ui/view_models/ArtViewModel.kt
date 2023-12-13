@@ -40,6 +40,19 @@ sealed class UiState {
     object Filled : UiState()
 }
 
+/**
+ * Explanation for how the DetailScreen works with data from a separate API.
+ * We parallelized the use of the APIs to increase the performance for the end user.
+ * And when data is not ready, we show a Loading animation for a short time.
+ *
+ * There are 2 APIs, one with Global data, and one with detailed data
+ * Detail data is prefetched when the general data emits to a Channel
+ * See processInParallelToGetDetailData() that consumes the Channel.
+ *
+ * If the data is not ready yet when the user clicks on the list, it is refetched
+ * See refetchArtDetail.
+ * activeDetailData is used to update the UI when the data is correctly updated.
+* */
 @HiltViewModel
 class ArtViewModel @Inject constructor(
     private val artDataRepository: ArtDataRepository,
