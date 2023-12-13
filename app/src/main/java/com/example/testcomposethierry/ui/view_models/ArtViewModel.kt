@@ -91,7 +91,6 @@ class ArtViewModel @Inject constructor(
     // init variables
     private var initialized = false
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun init(unexpectedServerDataErrorString: String, owner: LifecycleOwner) {
         if (initialized) {
             return
@@ -158,6 +157,10 @@ class ArtViewModel @Inject constructor(
                         resultDetail.value
                     }
                     else -> Unit
+                }
+                // for testing
+                if (BuildConfig.DEBUG) {
+                    emit(Unit)
                 }
             }
         }
