@@ -89,7 +89,7 @@ class ArtViewModel @Inject constructor(
                 receiveFlow.flatMapMerge<Pair<Int, String>, Unit>(concurrency = 10) { elementData ->
                     flow {
                         when (val resultDetail = artDataRepository.getArtObjectDetail(elementData.second)) {
-                            is ResultOf.Success -> mapArtDetail.getOrPut(elementData.first) { resultDetail.value }
+                            //is ResultOf.Success -> mapArtDetail.getOrPut(elementData.first) { resultDetail.value }
                             else -> Unit
                         }
                     }
@@ -122,5 +122,9 @@ class ArtViewModel @Inject constructor(
 
     fun closeChannel() {
         artElementIndexesToProcess.cancel()
+    }
+
+    fun getSavedArtDetail(rowId: Int): DataArtDetail? {
+        return mapArtDetail[rowId]
     }
 }

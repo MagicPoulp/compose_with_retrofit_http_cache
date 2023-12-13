@@ -102,7 +102,7 @@ fun NavigationScreen(
                 } catch (_: Exception) {
                     previousRow
                 }
-                DetailScreen(stateListArt = stateListArt, rowId = rowId)
+                DetailScreen(rowId = rowId)
                 LaunchedEffect(Unit) {
                     delay(300.milliseconds)
                     if (rowId != activeRow.value) {
