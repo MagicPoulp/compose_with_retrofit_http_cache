@@ -11,6 +11,7 @@ import okhttp3.Protocol
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.asResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
 import okio.Buffer
 import java.io.IOException
@@ -20,7 +21,7 @@ import javax.inject.Inject
 class PersistentDataManager @Inject constructor(
     ) {
     private var realm: Realm
-    val responseHeaders = Headers.Builder()
+    private val responseHeaders = Headers.Builder()
         .add("content-type", "application/json")
         .add("strict-transport-security", "max-age=2592000")
         .add("request-context", "appId=cid-v1:5f69f122-c4a2-4f7d-8b1e-6d66af0e0e99")
@@ -56,9 +57,8 @@ class PersistentDataManager @Inject constructor(
 
     fun loadResponse(url: String, request: Request, response: Response?) : Response {
         try {
-            var result: Response? = null
-            realm.writeBlocking {
-                val data = realm.query<DataResponseRealm>("url == $0", url).find().first()
+            return realm.writeBlocking {
+                val data: DataResponseRealm = realm.query<DataResponseRealm>("url == $0", url).find().firstOrNull() ?: DataResponseRealm()
                 val builder: Response.Builder = Response.Builder()
                 builder
                     .protocol(response?.protocol ?: Protocol.HTTP_2)
@@ -67,9 +67,8 @@ class PersistentDataManager @Inject constructor(
                     .code(200)
                     .message("success")
                     .body(data.body.toResponseBody(String.format("application/json; charset=utf-8").toMediaType()))
-                result = builder.build()
+                builder.build()
             }
-            return result!!
         } catch(t: Throwable) {
             println(t.message)
             throw t
@@ -88,7 +87,7 @@ class PersistentDataManager @Inject constructor(
         val source = body.source()
         if (source.request(limit)) throw IOException("body too long!")
         val bufferedCopy: Buffer = source.buffer.clone()
-        return ResponseBody.create(body.contentType(), body.contentLength(), bufferedCopy)
+        return bufferedCopy.asResponseBody(body.contentType(), body.contentLength())
     }
 
     fun close() {
