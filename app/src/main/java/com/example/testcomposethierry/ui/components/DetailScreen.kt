@@ -16,23 +16,23 @@ import kotlinx.coroutines.withContext
 
 @Composable
 fun DetailScreen(
-    stateListArt: LazyPagingItems<DataArtElement>,
     rowId: Int,
     artViewModel: ArtViewModel,
 ) {
     println("DB RENDER °°°")
     val activeDetailData by artViewModel.activeDetailData.collectAsStateWithLifecycle()
-    val artDetail = artViewModel.getSavedArtDetail(rowId)
-    if (artDetail == null && activeDetailData == null) {
-        CenterAlignedText("NULL")
-    }
-    else {
-        activeDetailData?.plaqueDescription?.let { CenterAlignedText(it) } ?: ProgressIndicator()
+    when (activeDetailData) {
+        null -> ProgressIndicator()
+        else -> activeDetailData?.plaqueDescription?.let { CenterAlignedText(it) }
+            ?: ErrorScreen(UiState.Error(Throwable("Missing data")))
     }
 
     LaunchedEffect(Unit) {
         println("DB LAUNCH °°°")
-        artDetail?.plaqueDescription?.let {
+        // initially the activeDetailData can be undefined
+        // but we can check the real data and update activeDetailData
+        val artDetail = artViewModel.getSavedArtDetail(rowId)
+        artDetail?.let {
             artViewModel.setActiveDetailData(artDetail)
         } ?: run {
             withContext(Dispatchers.IO) {
