@@ -1,11 +1,11 @@
-package com.example.testComposethierry.data.repositories
+package com.example.testcomposethierry.data.repositories
 
-import com.example.testComposethierry.data.config.AppConfig
-import com.example.testComposethierry.data.custom_structures.ResultOf
-import com.example.testComposethierry.data.http.ArtApi
-import com.example.testComposethierry.data.http.RetrofitHelper
-import com.example.testComposethierry.data.models.DataArtElement
-import com.example.testComposethierry.domain.ExtractDataArtUseCase
+import com.example.testcomposethierry.data.config.AppConfig
+import com.example.testcomposethierry.data.custom_structures.ResultOf
+import com.example.testcomposethierry.data.http.ArtApi
+import com.example.testcomposethierry.data.http.RetrofitHelper
+import com.example.testcomposethierry.data.models.DataArtElement
+import com.example.testcomposethierry.domain.ExtractDataArtUseCase
 import javax.inject.Inject
 
 class ArtDataRepository @Inject constructor(

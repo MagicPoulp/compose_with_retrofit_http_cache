@@ -1,4 +1,4 @@
-package com.example.testComposethierry.data.custom_structures
+package com.example.testcomposethierry.data.custom_structures
 
 // https://medium.com/swlh/kotlin-sealed-class-for-success-and-error-handling-d3054bef0d4e
 // Any prevents null data

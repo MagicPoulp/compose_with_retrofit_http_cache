@@ -1,7 +1,7 @@
-package com.example.testComposethierry.ui.setup
+package com.example.testcomposethierry.ui.setup
 
 import androidx.annotation.StringRes
-import com.example.testComposethierry.R
+import com.example.testcomposethierry.R
 
 // https://developer.android.com/jetpack/compose/navigation#create-navhost
 sealed class RoutingScreen(val route: String, @StringRes val resourceId: Int) {

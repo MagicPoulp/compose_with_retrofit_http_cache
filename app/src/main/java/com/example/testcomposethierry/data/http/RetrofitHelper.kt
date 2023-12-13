@@ -1,9 +1,9 @@
-package com.example.testComposethierry.data.http
+package com.example.testcomposethierry.data.http
 
 
-import com.example.testComposethierry.BuildConfig
-import com.example.testComposethierry.data.repositories.PersistentDataManager
-import com.example.testComposethierry.domain.ExtractDataArtUseCase
+import com.example.testcomposethierry.BuildConfig
+import com.example.testcomposethierry.data.repositories.PersistentDataManager
+import com.example.testcomposethierry.domain.ExtractDataArtUseCase
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import okhttp3.Dispatcher
 import okhttp3.Interceptor

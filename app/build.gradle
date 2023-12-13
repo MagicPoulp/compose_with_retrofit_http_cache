@@ -10,7 +10,7 @@ android {
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.example.testComposethierry"
+        applicationId "com.example.testcomposethierry"
         minSdk 21
         targetSdk 34
         versionCode 1
@@ -49,7 +49,7 @@ android {
     kapt {
         correctErrorTypes true
     }
-    namespace 'com.example.testComposethierry'
+    namespace 'com.example.testcomposethierry'
 
     packagingOptions {
         exclude 'META-INF/*'

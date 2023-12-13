@@ -1,4 +1,4 @@
-package com.example.testComposethierry.ui.components
+package com.example.testcomposethierry.ui.components
 
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
@@ -21,9 +21,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.example.testComposethierry.R
-import com.example.testComposethierry.ui.view_models.ArtViewModel
-import com.example.testComposethierry.ui.view_models.UiState
+import com.example.testcomposethierry.R
+import com.example.testcomposethierry.ui.view_models.ArtViewModel
+import com.example.testcomposethierry.ui.view_models.UiState
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 

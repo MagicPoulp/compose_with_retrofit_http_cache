@@ -1,4 +1,4 @@
-package com.example.testComposethierry.ui.reusable_components
+package com.example.testcomposethierry.ui.reusable_components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize

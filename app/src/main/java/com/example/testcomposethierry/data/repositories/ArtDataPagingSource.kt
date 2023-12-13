@@ -1,10 +1,10 @@
-package com.example.testComposethierry.data.repositories
+package com.example.testcomposethierry.data.repositories
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.example.testComposethierry.data.config.AppConfig
-import com.example.testComposethierry.data.custom_structures.ResultOf
-import com.example.testComposethierry.data.models.DataArtElement
+import com.example.testcomposethierry.data.config.AppConfig
+import com.example.testcomposethierry.data.custom_structures.ResultOf
+import com.example.testcomposethierry.data.models.DataArtElement
 
 // https://betterprogramming.pub/turn-the-page-overview-of-android-paging3-library-integration-with-jetpack-compose-3a7881ed75b4
 class ArtDataPagingSource (

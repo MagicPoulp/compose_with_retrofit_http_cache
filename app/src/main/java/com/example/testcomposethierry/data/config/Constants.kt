@@ -1,4 +1,4 @@
-package com.example.testComposethierry.data.config
+package com.example.testcomposethierry.data.config
 
 object AppConfig {
     // it must end with a slash
