@@ -29,7 +29,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun UiStateScreen(
-    artViewModel: ArtViewModel = hiltViewModel(),
+    artViewModel: ArtViewModel = hiltViewModel(), // the object from hiltViewModel() survives configuration changes
     activity: ComponentActivity,
 ) {
     val unexpectedServerDataErrorString = activity.resources.getString(R.string.unexpected_server_data)
@@ -37,6 +37,8 @@ fun UiStateScreen(
         unexpectedServerDataErrorString = unexpectedServerDataErrorString,
         owner = activity,
     )
+    val state by artViewModel.uiState.collectAsStateWithLifecycle()
+    val stateListArt = artViewModel.listArt.collectAsLazyPagingItems()
     Box(contentAlignment = Alignment.TopCenter,
         modifier = Modifier
             .background(MaterialTheme.colors.secondary)
@@ -46,8 +48,6 @@ fun UiStateScreen(
             .fillMaxWidth()
             .fillMaxHeight()
         ) {
-            val state by artViewModel.uiState.collectAsStateWithLifecycle()
-            val stateListArt = artViewModel.listArt.collectAsLazyPagingItems()
             when (state) {
                 // put each case here on ErrorScreen() to debug the error screen
                 is UiState.Empty -> ProgressIndicator()
