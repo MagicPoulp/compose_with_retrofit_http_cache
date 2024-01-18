@@ -38,11 +38,12 @@ fun DetailScreen(
         artDetail?.let {
             artViewModel.setActiveDetailData(artDetail)
         } ?: run {
-            withContext(Dispatchers.IO) {
-                val newDetail = artViewModel.refetchArtDetail(rowId, stateListArt)
-                newDetail?.let { detail ->
-                    artViewModel.setActiveDetailData(detail)
-                }
+            // the Default dispatcher is used by default by LaunchedEffect
+            // we do not need the IO dispatcher, because we need the result fast and the Default
+            // is prioritized
+            val newDetail = artViewModel.refetchArtDetail(rowId, stateListArt)
+            newDetail?.let { detail ->
+                artViewModel.setActiveDetailData(detail)
             }
         }
     }
