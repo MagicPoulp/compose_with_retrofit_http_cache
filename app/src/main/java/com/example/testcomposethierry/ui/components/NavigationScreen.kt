@@ -117,8 +117,8 @@ fun NavigationScreen(
                 DetailScreen(stateListArt = stateListArt, rowId = rowId, artViewModel = artViewModel)
                 // This LaunchedEffect is needed to mark in grey the active row in the main list
                 LaunchedEffect(Unit) {
-                    // we need a small delay so that we do not see the clicked row as active before
-                    // navigating to the DetailScreen
+                    // we need a small delay so that we do not see the clicked row as active
+                    // with plain dark gray before having navigated to DetailScreen
                     delay(300.milliseconds)
                     if (rowId != activeRow) {
                         artViewModel.setActiveRow(owner = activity, rowId = rowId)
