@@ -91,7 +91,14 @@ class ArtViewModel @Inject constructor(
     // init variables
     private var initialized = false
 
-    fun init(unexpectedServerDataErrorString: String, owner: LifecycleOwner) {
+    /*
+      This startPagerAndDataFetching() function is not from the constructor, it is called manually the first time UiStateScreen is composed.
+      And the initialized boolean prevents running more code in case of recomposition when the UI state changes.
+      we need the activity instance to call this code.
+      Note that even if we create the view model in the activity and call this startPagerAndDataFetching() function from the
+      activity, recomposition or configuration change is possible and we need the initialized boolean anyways.
+    * */
+    fun startPagerAndDataFetching(unexpectedServerDataErrorString: String, owner: LifecycleOwner) {
         println("INIT VIEW MODEL")
         if (initialized) {
             return

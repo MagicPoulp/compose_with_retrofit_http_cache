@@ -60,7 +60,7 @@ fun UiStateScreen(
     activity: ComponentActivity,
 ) {
     val unexpectedServerDataErrorString = activity.resources.getString(R.string.unexpected_server_data)
-    artViewModel.init(
+    artViewModel.startPagerAndDataFetching(
         unexpectedServerDataErrorString = unexpectedServerDataErrorString,
         owner = activity,
     )
