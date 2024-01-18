@@ -7,3 +7,7 @@ add use cases
 all things related to data should go into the repository
 
 refetchArtDetail should lie in a use case
+
+Test that the activity restart keeps the same view model
+And remove the niitialized in the view model
+

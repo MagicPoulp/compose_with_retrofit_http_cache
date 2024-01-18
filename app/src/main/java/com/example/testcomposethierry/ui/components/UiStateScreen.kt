@@ -30,7 +30,15 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun UiStateScreen(
-    artViewModel: ArtViewModel = hiltViewModel(), // the object from hiltViewModel() survives configuration changes
+    /*
+    From the documentation in the source code of hiltViewModel(), it is clear that the result
+    of hiltViewModel() is unique and survives configuration changes
+    Here is are not in a navigation graph, hence the view model is scoped the the activity
+
+    "Returns an existing HiltViewModel  -annotated ViewModel or creates a new one scoped to the current navigation graph present on the {@link NavController} back stack.
+If no navigation graph is currently present then the current scope will be used, usually, a fragment or an activity."
+    */
+    artViewModel: ArtViewModel = hiltViewModel(),
     activity: ComponentActivity,
 ) {
     val unexpectedServerDataErrorString = activity.resources.getString(R.string.unexpected_server_data)
