@@ -27,9 +27,13 @@ fun DetailScreen(
             ?: ErrorScreen(UiState.Error(Throwable("Missing data")))
     }
 
+    // This LaunchedEffect means that we want to do something immediately after composing the
+    // DetailScreen
     LaunchedEffect(Unit) {
-        // initially the activeDetailData can be undefined
-        // but we can check the real data and update activeDetailData
+        // activeDetailData is used above to trigger the UI to show data
+        // if there is no detail data from the mechanism with the Channel,
+        // we fetch the detail data directly
+        // Afterwards, we set activeDetailData
         val artDetail = artViewModel.getSavedArtDetail(rowId)
         artDetail?.let {
             artViewModel.setActiveDetailData(artDetail)
