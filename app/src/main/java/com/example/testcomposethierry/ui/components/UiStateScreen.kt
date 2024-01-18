@@ -35,8 +35,26 @@ fun UiStateScreen(
     of hiltViewModel() is unique and survives configuration changes
     Here is are not in a navigation graph, hence the view model is scoped the the activity
 
-    "Returns an existing HiltViewModel  -annotated ViewModel or creates a new one scoped to the current navigation graph present on the {@link NavController} back stack.
-If no navigation graph is currently present then the current scope will be used, usually, a fragment or an activity."
+    The doc says: "Returns an existing HiltViewModel  -annotated ViewModel or creates a new one scoped to the current navigation graph present on the {@link NavController} back stack.
+    If no navigation graph is currently present then the current scope will be used, usually, a fragment or an activity."
+
+    --> Experience to test that it is true:
+
+    Add a breakpoint in an init in the view Model
+    init {
+        println("INIT VIEW MODEL")
+    }
+
+    restart the activity in the onCreate of the activity
+            Handler().postDelayed({
+            onPause()
+            onStop()
+            onRestart()
+
+        }, 10000)
+
+    And observe that the hilt view model survives the configuration change.
+    Because the init from the constructor call is not called more than once.
     */
     artViewModel: ArtViewModel = hiltViewModel(),
     activity: ComponentActivity,

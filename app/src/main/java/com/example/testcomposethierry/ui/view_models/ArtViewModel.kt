@@ -92,6 +92,7 @@ class ArtViewModel @Inject constructor(
     private var initialized = false
 
     fun init(unexpectedServerDataErrorString: String, owner: LifecycleOwner) {
+        println("INIT VIEW MODEL")
         if (initialized) {
             return
         }
