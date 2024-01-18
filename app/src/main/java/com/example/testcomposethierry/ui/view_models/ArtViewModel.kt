@@ -147,7 +147,7 @@ class ArtViewModel @Inject constructor(
     private fun processInParallelToGetDetailData(receiveFlow: Flow<Pair<Int, String>>): Flow<Unit> {
         return receiveFlow.flatMapMerge<Pair<Int, String>, Unit>(concurrency = numberOfConcurrentDetailPrefetching) { elementData ->
             flow {
-                // TOTEST: comment this so that there is no prefetching of the detail data
+                // TOTEST: comment this part so that there is no prefetching of the detail data
                 // data is refetched when clicking on a row
                 when (val resultDetail = artDataRepository.getArtObjectDetail(elementData.second)) {
                     is ResultOf.Success -> mapArtDetail.getOrPut(elementData.first) {
