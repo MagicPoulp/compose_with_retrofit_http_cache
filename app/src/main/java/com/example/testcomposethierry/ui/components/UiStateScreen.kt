@@ -71,6 +71,7 @@ fun UiStateScreen(
                 }
             }
 
+            // collectAsLazyPagingItems() cannot work in the viewModel, it must lie in a Composable function
             // LazyPagingItems cannot be collected in the ViewModel, but it can be in a LaunchedEffect
             // https://developer.android.com/jetpack/compose/side-effects#snapshotFlow
             LaunchedEffect(Unit) {
