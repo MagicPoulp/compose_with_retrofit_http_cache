@@ -4,8 +4,6 @@ use a singleton in hilt and not an initialized boolean
 
 add use cases
 
-don't use launched effects
-
 all things related to data should go into the repository
 
-
+refetchArtDetail should lie in a use case
