@@ -1,0 +1,9 @@
+use many view models
+
+use a singleton in hilt and not an initialized boolean
+
+add use cases
+
+don use launched effects
+
+
