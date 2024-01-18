@@ -20,9 +20,12 @@ class ArtDataPagingSource (
         val nextPageNumber = params.key ?: 0
         val pagingSize = AppConfig.pagingSize
         return when (val response = artDataRepository.getArtPaged(pagingSize, nextPageNumber)) {
+            // Try this line below to test the LaunchEffect(LaunchedEffect(stateListArt.loadState) {)
+            // is ResultOf.Success -> LoadResult.Error(Exception(unexpectedServerDataErrorString))
             is ResultOf.Success -> if (response.value.isEmpty()) LoadResult.Error(Exception(unexpectedServerDataErrorString)) else {
                 /*
-                // commented because the sending to the Channel to fetch the detail data was moved to the ViewModel,
+                // commented code below because the sending to the Channel to fetch the detail data was moved to the ViewModel,
+                // because filtering had to be done
                 // After filtering the duplicates. It is important to have a correct index
                 response.value.forEachIndexed { index, v ->
                     val elementGlobalIndex = index + pagingSize * nextPageNumber

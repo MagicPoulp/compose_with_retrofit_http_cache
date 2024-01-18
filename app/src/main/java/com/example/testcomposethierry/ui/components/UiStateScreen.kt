@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
+import androidx.paging.PagingSource
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.testcomposethierry.R
 import com.example.testcomposethierry.ui.view_models.ArtViewModel
@@ -58,6 +59,22 @@ fun UiStateScreen(
                 }
             }
 
+            /*
+            LoadResult.Error will result in a changed stateListArt.loadState
+            If the lazy loading has an error state, we update the UI State to an error
+            Excerpt from androidx.paging / PagingSource.kt
+         public sealed class LoadResult<Key : Any, Value : Any> {
+         * Error result object for [PagingSource.load].
+         *
+         * This return type indicates an expected, recoverable error (such as a network load
+         * failure). This failure will be forwarded to the UI as a [LoadState.Error], and may be
+         * retried.
+         *
+         * @sample androidx.paging.samples.pageKeyedPagingSourceSample
+             public data class Error<Key : Any, Value : Any>(
+                 val throwable: Throwable
+             ) : PagingSource.LoadResult<Key, Value>()
+            */
             LaunchedEffect(stateListArt.loadState) {
                 stateListArt.apply {
                     if (loadState.refresh is LoadState.Error) {
