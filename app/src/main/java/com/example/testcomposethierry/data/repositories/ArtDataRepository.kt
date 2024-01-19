@@ -69,4 +69,8 @@ class ArtDataRepository @Inject constructor(
         }
         return ResultOf.Failure(response.message(), null)
     }
+
+    fun onDestroy() {
+        retrofitHelper.onDestroy()
+    }
 }

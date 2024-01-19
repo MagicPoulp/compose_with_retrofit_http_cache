@@ -25,6 +25,11 @@ import javax.inject.Inject
 class RetrofitHelper @Inject constructor(
     private val persistentDataManager: PersistentDataManager,
 ) {
+
+    fun onDestroy() {
+        persistentDataManager.close()
+    }
+
     // we can specify the base url, the max number of concurrent connections, and an extra API key header
     fun getInstance(baseUrl: String, okHttpClient: OkHttpClient?, requestHeaders: List<Pair<String, String>>?): Retrofit {
 

@@ -61,7 +61,6 @@ sealed class UiState {
 @HiltViewModel
 class ArtViewModel @Inject constructor(
     private val artDataRepository: ArtDataRepository,
-    private val persistentDataManager: PersistentDataManager,
 ) : ViewModel() {
     // ------------------------------------------
     // user data variables
@@ -90,6 +89,12 @@ class ArtViewModel @Inject constructor(
     // ------------------------------------------
     // init variables
     private var isPagerinitialized = false
+
+    override fun onCleared() {
+        super.onCleared()
+        artElementIndexesToProcess.cancel()
+        artDataRepository.onDestroy()
+    }
 
     /*
       This startPagerAndDataFetching() function is not from the constructor, it is called manually the first time UiStateScreen is composed.
@@ -192,12 +197,6 @@ class ArtViewModel @Inject constructor(
         if (newActiveDetailData != _activeDetailData.value) {
             _activeDetailData.emit(newActiveDetailData)
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        persistentDataManager.close()
-        artElementIndexesToProcess.cancel()
     }
 
     fun getSavedArtDetail(rowId: Int): DataArtDetail? {
