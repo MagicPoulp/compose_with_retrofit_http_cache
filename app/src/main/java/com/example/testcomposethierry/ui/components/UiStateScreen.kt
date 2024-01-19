@@ -35,7 +35,8 @@ fun UiStateScreen(
     of hiltViewModel() is unique and survives configuration changes
     Here is are not in a navigation graph, hence the view model is scoped the the activity
 
-    The doc says: "Returns an existing HiltViewModel  -annotated ViewModel or creates a new one scoped to the current navigation graph present on the {@link NavController} back stack.
+    The doc says: "Returns an existing HiltViewModel  -annotated ViewModel or creates a new one scoped to the
+    current navigation graph present on the {@link NavController} back stack.
     If no navigation graph is currently present then the current scope will be used, usually, a fragment or an activity."
 
     --> Experience to test that it is true:

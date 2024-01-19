@@ -89,7 +89,7 @@ class ArtViewModel @Inject constructor(
 
     // ------------------------------------------
     // init variables
-    private var initialized = false
+    private var isPagerinitialized = false
 
     /*
       This startPagerAndDataFetching() function is not from the constructor, it is called manually the first time UiStateScreen is composed.
@@ -99,11 +99,10 @@ class ArtViewModel @Inject constructor(
       activity, recomposition or configuration change is possible and we need the initialized boolean anyways.
     * */
     fun startPagerAndDataFetching(unexpectedServerDataErrorString: String, owner: LifecycleOwner) {
-        println("INIT VIEW MODEL")
-        if (initialized) {
+        if (isPagerinitialized) {
             return
         }
-        initialized = true
+        isPagerinitialized = true
 
         // one can add a RemoteMediator for caching
         // https://developer.android.com/topic/libraries/architecture/paging/v3-network-db
