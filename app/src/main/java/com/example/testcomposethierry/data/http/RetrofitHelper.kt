@@ -72,7 +72,7 @@ class RetrofitHelper @Inject constructor(
                 persistentDataManager.loadResponse(request.url.toString(), request, response)
             }
             response
-            // TOTEST: to develop without using the server, use this
+            // how to test: to develop without using the server, use this
             //persistentDataManager.loadResponse(request.url.toString(), request, response)
         })
 
