@@ -90,6 +90,8 @@ class ArtViewModel @Inject constructor(
     // init variables
     private var isPagerinitialized = false
 
+    // the view model survives configuration changes
+    // But an activity stop will release the resources to free memory
     override fun onCleared() {
         super.onCleared()
         artElementIndexesToProcess.cancel()
