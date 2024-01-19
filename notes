@@ -1,13 +1,21 @@
-use many view models
+Remarks on possible improvements:
 
-use a singleton in hilt and not an initialized boolean
+--> Avoid LaunchedEffects and use only the view model
 
-add use cases
+I justified for each why a LaunchedEffect is necessary
 
-all things related to data should go into the repository
+--> use a singleton in hilt and not an initialized boolean
+See the text, I did an experience restarting the activity and the
+view model does not call the constructor
 
-refetchArtDetail should lie in a use case
+I renamed the init() function startPagerAndDataFetching() to make clear it is called manually just once to fetch data,
+and I explained why the boolean is necessary.
 
-Test that the activity restart keeps the same view model
-And remove the niitialized in the view model
+--> use many view models
+
+--> add use cases
+
+--> all things related to data should go into a repository
+
+--> refetchArtDetail should lie in a use case
 
