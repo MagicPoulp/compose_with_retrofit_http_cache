@@ -22,6 +22,7 @@ import com.example.testcomposethierry.data.models.DataArtElement
 import com.example.testcomposethierry.data.repositories.ArtDataRepository
 import com.example.testcomposethierry.data.repositories.ArtDataPagingSource
 import com.example.testcomposethierry.data.repositories.PersistentDataManager
+import com.example.testcomposethierry.domain.network.RefetchArtDetailUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -61,6 +62,7 @@ sealed class UiState {
 @HiltViewModel
 class ArtViewModel @Inject constructor(
     private val artDataRepository: ArtDataRepository,
+    private val refetchArtDetailUseCase: RefetchArtDetailUseCase,
 ) : ViewModel() {
     // ------------------------------------------
     // user data variables
@@ -206,19 +208,6 @@ class ArtViewModel @Inject constructor(
     }
 
     suspend fun refetchArtDetail(rowId: Int, stateListArt: LazyPagingItems<DataArtElement>): DataArtDetail? {
-        val itemData = stateListArt.itemSnapshotList[rowId]
-        itemData?.objectNumber?.let { objectNumber ->
-            when (val resultDetail = artDataRepository.getArtObjectDetail(objectNumber)) {
-                is ResultOf.Success -> {
-                    mapArtDetail.getOrPut(rowId) {
-                        setActiveDetailData(resultDetail.value)
-                        resultDetail.value
-                    }
-                    return resultDetail.value
-                }
-                else -> Unit
-            }
-        }
-        return null
+        return refetchArtDetailUseCase(rowId, stateListArt, mapArtDetail)
     }
 }

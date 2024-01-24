@@ -11,11 +11,14 @@ view model does not call the constructor
 I renamed the init() function startPagerAndDataFetching() to make clear it is called manually just once to fetch data,
 and I explained why the boolean is necessary.
 
+--> refetchArtDetail should lie in a use case
+Done
+
+Ramaining:
+
 --> use many view models
 
 --> add use cases
 
 --> all things related to data should go into a repository
-
---> refetchArtDetail should lie in a use case
 
