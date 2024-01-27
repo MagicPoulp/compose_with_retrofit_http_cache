@@ -11,7 +11,8 @@ import com.example.testcomposethierry.data.custom_structures.ResultOf
 import com.example.testcomposethierry.data.models.DataArtDetail
 import com.example.testcomposethierry.data.models.DataArtElement
 import com.example.testcomposethierry.data.repositories.ArtDataRepository
-import com.example.testcomposethierry.domain.network.RefetchArtDetailUseCase
+import com.example.testcomposethierry.domain.detailscreen.GetDetailDataInParallelUseCase
+import com.example.testcomposethierry.domain.detailscreen.RefetchArtDetailUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,20 +30,20 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DetailScreenViewModel @Inject constructor(
-    private val artDataRepository: ArtDataRepository,
     private val refetchArtDetailUseCase: RefetchArtDetailUseCase,
+    private val getDetailDataInParallelUseCase: GetDetailDataInParallelUseCase,
 ) : ViewModel() {
     private val _activeDetailData: MutableStateFlow<DataArtDetail?> = MutableStateFlow(null)
     val activeDetailData: StateFlow<DataArtDetail?>
         get() = _activeDetailData.asStateFlow()
-    private val numberOfConcurrentDetailPrefetching = 10
     private val mapArtDetail: MutableMap<Int, DataArtDetail> = hashMapOf()
     private var isDataSavinginitialized = false
 
     // ------------------------------------------
+
     fun startDataSaving(
         owner: LifecycleOwner,
-        artElementIndexesToProcess: Channel<Pair<Int, String>>
+        channelIndexesToPrefetch: Channel<Pair<Int, String>>
     ) {
         if (isDataSavinginitialized) {
             return
@@ -52,35 +53,9 @@ class DetailScreenViewModel @Inject constructor(
         // it does not matter if we drop certain elements, because we refetch details if we click
         owner.lifecycleScope.launch(Dispatchers.IO) {
             owner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                consumeChannelAndPrefetchInParallel(artElementIndexesToProcess)
+                getDetailDataInParallelUseCase(channelIndexesToPrefetch, mapArtDetail)
                     // a cold flow is not executed without a collector
                     .collect()
-            }
-        }
-    }
-
-    private fun consumeChannelAndPrefetchInParallel(channel: Channel<Pair<Int, String>>): Flow<Unit> {
-        val receiveFlow = channel.receiveAsFlow()
-        return processInParallelToGetDetailData(receiveFlow)
-    }
-
-    // how to test: see the unit test in the test suite
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private fun processInParallelToGetDetailData(receiveFlow: Flow<Pair<Int, String>>): Flow<Unit> {
-        return receiveFlow.flatMapMerge<Pair<Int, String>, Unit>(concurrency = numberOfConcurrentDetailPrefetching) { elementData ->
-            flow {
-                // how to test: comment this part so that there is no prefetching of the detail data
-                // data is refetched when clicking on a row
-                when (val resultDetail = artDataRepository.getArtObjectDetail(elementData.second)) {
-                    is ResultOf.Success -> mapArtDetail.getOrPut(elementData.first) {
-                        resultDetail.value
-                    }
-                    else -> Unit
-                }
-                // for testing
-                if (BuildConfig.DEBUG) {
-                    emit(Unit)
-                }
             }
         }
     }

@@ -11,8 +11,9 @@ import androidx.paging.map
 import com.example.testcomposethierry.BuildConfig
 import com.example.testcomposethierry.data.config.AppConfig
 import com.example.testcomposethierry.data.models.DataArtElement
-import com.example.testcomposethierry.data.repositories.ArtDataPagingSource
+import com.example.testcomposethierry.data.ArtDataPagingSource
 import com.example.testcomposethierry.data.repositories.ArtDataRepository
+import com.example.testcomposethierry.domain.uistate.FilterPagingDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -25,9 +26,9 @@ import javax.inject.Inject
 @HiltViewModel
 class UiStateScreenViewModel @Inject constructor(
     private val artDataRepository: ArtDataRepository,
+    private val filterPagingDataUseCase: FilterPagingDataUseCase,
 ) : ViewModel()
 {
-    // ------------------------------------------
     // UI state variables
     // The UI state for showing the first page with a spinner or not
     private val _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState.Empty)
@@ -39,7 +40,7 @@ class UiStateScreenViewModel @Inject constructor(
     // unbuffered channel, needed for concurrency data
     // there is no reason to limit the size of the channel, because we consume it on a limited number of tasks
     // limiting this size, could theoretically block the repository function that sends.
-    val artElementIndexesToProcess = Channel<Pair<Int, String>>(Channel.UNLIMITED)
+    val channelIndexesToPrefetch = Channel<Pair<Int, String>>(Channel.UNLIMITED)
 
     // ------------------------------------------
 
@@ -73,39 +74,19 @@ class UiStateScreenViewModel @Inject constructor(
             ArtDataPagingSource(unexpectedServerDataErrorString, artDataRepository)
         }
             .flow
-            .map { pagingData ->
-                // This filtering is optional, it is just because the API send us duplicates.
-                // We filter duplicate object numbers.
-                // https://stackoverflow.com/questions/69284841/how-to-avoid-duplicate-items-in-pagingadapter
-                // The museum API has a bug since duplicate pages can be returned
-                // the 2 following calls give duplicates, and then the next pages are totally distinct
-                // curl https://www.rijksmuseum.nl/api/en/collection?key=rIl6yb6x\&ps=3\&p=0
-                // curl https://www.rijksmuseum.nl/api/en/collection?key=rIl6yb6x\&ps=3\&p=1
-                val objectNumbersHashSet = hashSetOf<String>()
-                val pagingDataWithoutDuplicates = pagingData.filter { elem ->
-                    elem.objectNumber?.let { objectNumbersHashSet.add(elem.objectNumber) }
-                        ?: false
-                }
-                var itemIndex = -1
-                pagingDataWithoutDuplicates.map { elem ->
-                    itemIndex += 1
-                    elem.objectNumber?.let {
-                        // We send to the Channel the IDs that need to be prefetched for getting the detail data
-                        artElementIndexesToProcess.send(Pair(itemIndex, elem.objectNumber))
-                    }
-                    elem
-                }
-            }
+            .map { pagingData -> filterPagingDataUseCase(pagingData, channelIndexesToPrefetch) }
             // The cachedIn() operator makes the data stream shareable and caches the loaded data with the provided CoroutineScope. In any configuration change, it will provide the existing data instead of getting the data from scratch. It will also prevent memory leak.
             // https://medium.com/huawei-developers/what-is-paging3-mvvm-flow-databinding-hilt-d4fe6b1b11ec
             .cachedIn(viewModelScope)
     }
 
+    // we use the top level view model to run destruction
+    // kotlin/ has no destructors, but the view model has onCleared()
     // the view model survives configuration changes
     // But an activity stop will release the resources to free memory
     override fun onCleared() {
         super.onCleared()
-        artElementIndexesToProcess.cancel()
+        channelIndexesToPrefetch.cancel()
         artDataRepository.onDestroy()
     }
 }

@@ -1,7 +1,6 @@
-package com.example.testcomposethierry.domain
+package com.example.testcomposethierry.domain.artdatarepository
 
 import com.example.testcomposethierry.data.models.DataArtElement
-import com.example.testcomposethierry.data.models.DataArtFull
 import javax.inject.Inject
 
 class ExtractDataArtUseCase @Inject constructor() {

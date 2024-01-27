@@ -5,21 +5,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.testing.TestLifecycleOwner
 import app.cash.turbine.test
+import com.example.testcomposethierry.data.models.DataArtDetail
 import com.example.testcomposethierry.data.repositories.ArtDataRepository
-import com.example.testcomposethierry.data.repositories.PersistentDataManager
-import com.example.testcomposethierry.domain.network.RefetchArtDetailUseCase
-import com.example.testcomposethierry.ui.view_models.ArtViewModel
+import com.example.testcomposethierry.domain.detailscreen.GetDetailDataInParallelUseCase
+import com.example.testcomposethierry.domain.detailscreen.RefetchArtDetailUseCase
+import com.example.testcomposethierry.ui.view_models.DetailScreenViewModel
 import dagger.hilt.android.testing.HiltAndroidTest
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.AbstractFlow
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -28,7 +23,6 @@ import kotlinx.coroutines.test.setMain
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
@@ -50,7 +44,8 @@ testLifecycleOwner = TestLifecycleOwner()
 @HiltAndroidTest
 class ExampleUnitTest {
 
-    lateinit var artViewModel: ArtViewModel
+    lateinit var detailScreenViewModel: DetailScreenViewModel
+    lateinit var getDetailDataInParallelUseCase: GetDetailDataInParallelUseCase
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @BeforeEach
@@ -59,14 +54,15 @@ class ExampleUnitTest {
         // this dispatcher skips delays
         Dispatchers.setMain(UnconfinedTestDispatcher())
         val artDataRepository = mock<ArtDataRepository>()
+        val refetchArtDetailUseCase = mock<RefetchArtDetailUseCase>()
         //{
             //onBlocking { getPokemon() } doReturn testingPokemonList
         //}
-        val refetchArtDetailUseCase = mock<RefetchArtDetailUseCase>()
         //{
-           // on { invoke(any()) } doReturn testingPokemonDetails
+        // on { invoke(any()) } doReturn testingPokemonDetails
         //}
-        artViewModel = ArtViewModel(artDataRepository, refetchArtDetailUseCase)
+        getDetailDataInParallelUseCase = GetDetailDataInParallelUseCase(artDataRepository)
+        detailScreenViewModel = DetailScreenViewModel(refetchArtDetailUseCase, getDetailDataInParallelUseCase)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -77,22 +73,27 @@ class ExampleUnitTest {
 
     @Test
     fun testParallelFetchingOfDetailData() = runTest {
+        // commented cde out since we can run a use case directly instead of using a private function
         // we use getDeclaredMethod to access a private method
         // the types of the method's arguments are needed in the second parameter
-        val methodToTest: Method = artViewModel.javaClass.getDeclaredMethod("consumeChannelAndPrefetchInParallel", Channel::class.java)
+        /*val methodToTest: Method = detailScreenViewModel.javaClass.getDeclaredMethod("consumeChannelAndPrefetchInParallel", Channel::class.java)
         methodToTest.isAccessible = true
+        */
         val channel = Channel<Pair<Int, String>>(Channel.UNLIMITED)
-        val parameters = arrayOfNulls<Any>(1)
-        parameters[0] = channel
+        //val parameters = arrayOfNulls<Any>(1)
+        //parameters[0] = channel
+        //@Suppress("UNCHECKED_CAST")
+        //val methodResult: Flow<Unit> = methodToTest.invoke(detailScreenViewModel, *parameters) as Flow<Unit>
 
         // input data
         val channelInputList = listOf(Pair(1, "ObjectNumber1"), Pair(2, "ObjectNumber2"), Pair(3, "ObjectNumber3"))
 
+        val mapArtDetail: MutableMap<Int, DataArtDetail> = mutableMapOf()
+
         // testLifecycleOwner starts on the state STARTED
         val testLifecycleOwner = TestLifecycleOwner()
-        @Suppress("UNCHECKED_CAST")
-        val methodResult: Flow<Unit> = methodToTest.invoke(artViewModel, *parameters) as Flow<Unit>
         // the command below is needed to activate turbine on methodResult's flow
+        val methodResult: Flow<Unit> = getDetailDataInParallelUseCase(channel, mapArtDetail)
         methodResult.test {
             var numCollect = 0
             testLifecycleOwner.lifecycleScope.launch {

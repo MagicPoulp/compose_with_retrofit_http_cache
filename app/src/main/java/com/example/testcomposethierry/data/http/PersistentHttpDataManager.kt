@@ -1,4 +1,4 @@
-package com.example.testcomposethierry.data.repositories
+package com.example.testcomposethierry.data.http
 
 import com.example.testcomposethierry.data.models.DataResponseRealm
 import io.realm.kotlin.Realm
@@ -17,8 +17,7 @@ import okio.Buffer
 import java.io.IOException
 import javax.inject.Inject
 
-
-class PersistentDataManager @Inject constructor(
+class PersistentHttpDataManager @Inject constructor(
     ) {
     private var realm: Realm
     private val responseHeaders = Headers.Builder()

@@ -1,16 +1,12 @@
 package com.example.testcomposethierry.data.http
 
 
-import com.example.testcomposethierry.BuildConfig
-import com.example.testcomposethierry.data.repositories.PersistentDataManager
-import com.example.testcomposethierry.domain.ExtractDataArtUseCase
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import okhttp3.Dispatcher
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
 import java.util.concurrent.TimeUnit
@@ -23,11 +19,11 @@ import javax.inject.Inject
 // add a header:
 // https://stackoverflow.com/questions/32605711/adding-header-to-all-request-with-retrofit-2
 class RetrofitHelper @Inject constructor(
-    private val persistentDataManager: PersistentDataManager,
+    private val persistentHttpDataManager: PersistentHttpDataManager,
 ) {
 
     fun onDestroy() {
-        persistentDataManager.close()
+        persistentHttpDataManager.close()
     }
 
     // we can specify the base url, the max number of concurrent connections, and an extra API key header
@@ -61,15 +57,15 @@ class RetrofitHelper @Inject constructor(
             {
                 print(t.message)
                 if (t.message?.contains("Unable to resolve host") == true) { // no internet
-                    return@Interceptor persistentDataManager.loadResponse(request.url.toString(), request, null)
+                    return@Interceptor persistentHttpDataManager.loadResponse(request.url.toString(), request, null)
                 }
                 throw t
             })
             if (response.isSuccessful) {
-                persistentDataManager.saveResponse(request.url.toString(), response)
+                persistentHttpDataManager.saveResponse(request.url.toString(), response)
             }
             if (response.code == 503) {
-                persistentDataManager.loadResponse(request.url.toString(), request, response)
+                persistentHttpDataManager.loadResponse(request.url.toString(), request, response)
             }
             response
             // how to test: to develop without using the server, use this
