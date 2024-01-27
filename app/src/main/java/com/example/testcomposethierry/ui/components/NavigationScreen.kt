@@ -23,16 +23,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import com.example.testcomposethierry.data.models.DataArtElement
 import com.example.testcomposethierry.ui.setup.RoutingScreen
-import com.example.testcomposethierry.ui.view_models.ArtViewModel
+import com.example.testcomposethierry.ui.view_models.DetailScreenViewModel
+import com.example.testcomposethierry.ui.view_models.ListScreenViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -41,16 +40,17 @@ fun NavigationScreen(
     activity: ComponentActivity,
     listArtPagingItems: LazyPagingItems<DataArtElement>,
     artElementIndexesToProcess: Channel<Pair<Int, String>>,
-    artViewModel: ArtViewModel = hiltViewModel(),
+    listScreenViewModel: ListScreenViewModel = hiltViewModel(),
+    detailScreenViewModel: DetailScreenViewModel = hiltViewModel(),
 ) {
-    artViewModel.startDataSaving(activity, artElementIndexesToProcess)
+    detailScreenViewModel.startDataSaving(activity, artElementIndexesToProcess)
     val navController = rememberNavController()
     navController.addOnDestinationChangedListener { _, destination, _ ->
         CoroutineScope(Dispatchers.IO).launch {
             // needed to avoid seeing the old text in the Detail Screen
             // but we cannot set null when navigating to the Detail screen or it interfers with the data
             if (destination.route != RoutingScreen.MyDetailScreen.route) {
-                artViewModel.setActiveDetailData(null)
+                detailScreenViewModel.setActiveDetailData(null)
             }
         }
     }
@@ -58,7 +58,7 @@ fun NavigationScreen(
         RoutingScreen.MyListScreen,
         RoutingScreen.MyDetailScreen,
     )
-    val activeRow by artViewModel.activeRow.collectAsStateWithLifecycle()
+    val activeRow by listScreenViewModel.activeRow.collectAsStateWithLifecycle()
     Scaffold(
         backgroundColor = MaterialTheme.colors.secondary,
         bottomBar = {
@@ -78,6 +78,7 @@ fun NavigationScreen(
                         },
                         label = { Text(stringResource(screen.resourceId)) },
                         selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                        // navigation from the bottom bar
                         onClick = {
                             navController.navigate(screen.route) {
                                 // Pop up to the start destination of the graph to
@@ -107,26 +108,27 @@ fun NavigationScreen(
                     activeRow = activeRow,
                     listArtPagingItems = listArtPagingItems,
                     navController = navController,
-
                 )
             }
             // anomaly: as reported in this stack overflow, navigating, recomposes twice
             // https://stackoverflow.com/questions/69190119/jetpack-compose-recompose-with-success-state-twice-when-exiting-current-composab?noredirect=1&lq=1
             composable(RoutingScreen.MyDetailScreen.route) { backStackEntry ->
+                // this allows with the bottom back to go back and forth on previous active row
+                // and it starts at 0
                 val previousRow = if (activeRow != -1) activeRow else 0
                 val rowId = try {
                     backStackEntry.arguments?.getString("rowId")?.toInt() ?: previousRow
                 } catch (_: Exception) {
                     previousRow
                 }
-                DetailScreen(listArtPagingItems = listArtPagingItems, rowId = rowId, artViewModel = artViewModel)
+                DetailScreen(listArtPagingItems = listArtPagingItems, rowId = rowId, detailScreenViewModel = detailScreenViewModel)
                 // This LaunchedEffect is needed to mark in grey the active row in the main list
                 LaunchedEffect(Unit) {
                     // we need a small delay so that we do not see the clicked row as active
                     // with plain dark gray before having navigated to DetailScreen
                     delay(300.milliseconds)
                     if (rowId != activeRow) {
-                        artViewModel.setActiveRow(owner = activity, rowId = rowId)
+                        listScreenViewModel.setActiveRow(owner = activity, rowId = rowId)
                     }
                 }
             }

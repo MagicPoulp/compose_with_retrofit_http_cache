@@ -3,24 +3,22 @@ package com.example.testcomposethierry.ui.components
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import com.example.testcomposethierry.data.models.DataArtElement
+import com.example.testcomposethierry.ui.components.uistate.ErrorScreen
+import com.example.testcomposethierry.ui.components.uistate.ProgressIndicator
 import com.example.testcomposethierry.ui.reusable_components.CenterAlignedText
-import com.example.testcomposethierry.ui.view_models.ArtViewModel
+import com.example.testcomposethierry.ui.view_models.DetailScreenViewModel
 import com.example.testcomposethierry.ui.view_models.UiState
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @Composable
 fun DetailScreen(
     listArtPagingItems: LazyPagingItems<DataArtElement>,
     rowId: Int,
-    artViewModel: ArtViewModel,
+    detailScreenViewModel: DetailScreenViewModel,
 ) {
-    val activeDetailData by artViewModel.activeDetailData.collectAsStateWithLifecycle()
+    val activeDetailData by detailScreenViewModel.activeDetailData.collectAsStateWithLifecycle()
     when (activeDetailData) {
         null -> ProgressIndicator()
         else -> activeDetailData?.plaqueDescription?.let { CenterAlignedText(it) }
@@ -34,16 +32,16 @@ fun DetailScreen(
         // if there is no detail data from the mechanism with the Channel,
         // we fetch the detail data directly
         // Afterwards, we set activeDetailData
-        val artDetail = artViewModel.getSavedArtDetail(rowId)
+        val artDetail = detailScreenViewModel.getSavedArtDetail(rowId)
         artDetail?.let {
-            artViewModel.setActiveDetailData(artDetail)
+            detailScreenViewModel.setActiveDetailData(artDetail)
         } ?: run {
             // the Default dispatcher is used by default by LaunchedEffect
             // we do not need the IO dispatcher, because we need the result fast and the Default
             // is prioritized
-            val newDetail = artViewModel.refetchArtDetail(rowId, listArtPagingItems)
+            val newDetail = detailScreenViewModel.refetchArtDetail(rowId, listArtPagingItems)
             newDetail?.let { detail ->
-                artViewModel.setActiveDetailData(detail)
+                detailScreenViewModel.setActiveDetailData(detail)
             }
         }
     }

@@ -74,6 +74,7 @@ fun TableItemRow(
     val isPreviousActiveRow = index == activeRow
     Box(
         modifier = Modifier
+            // the last clicked row is in dark gray
             .background(color = if (isPreviousActiveRow) MaterialTheme.colors.primary else MaterialTheme.colors.secondary)
             .height(rowHeight),
         contentAlignment = Alignment.Center) {

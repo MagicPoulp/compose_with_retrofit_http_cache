@@ -10,8 +10,8 @@ import javax.inject.Inject
 class RefetchArtDetailUseCase @Inject constructor(
     private val artDataRepository: ArtDataRepository,
 ) {
-    suspend operator fun invoke(rowId: Int, stateListArt: LazyPagingItems<DataArtElement>, mapArtDetail: MutableMap<Int, DataArtDetail>): DataArtDetail? {
-        val itemData = stateListArt.itemSnapshotList[rowId]
+    suspend operator fun invoke(rowId: Int, listArtPagingItems: LazyPagingItems<DataArtElement>, mapArtDetail: MutableMap<Int, DataArtDetail>): DataArtDetail? {
+        val itemData = listArtPagingItems.itemSnapshotList[rowId]
         itemData?.objectNumber?.let { objectNumber ->
             when (val resultDetail = artDataRepository.getArtObjectDetail(objectNumber)) {
                 is ResultOf.Success -> {

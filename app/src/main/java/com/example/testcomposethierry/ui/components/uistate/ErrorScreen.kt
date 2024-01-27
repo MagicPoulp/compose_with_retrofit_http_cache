@@ -1,4 +1,4 @@
-package com.example.testcomposethierry.ui.components
+package com.example.testcomposethierry.ui.components.uistate
 
 import android.content.ComponentName
 import android.content.Intent
