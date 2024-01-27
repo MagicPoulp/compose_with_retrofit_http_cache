@@ -33,7 +33,7 @@ val rowHeight = 60.dp
 @Composable
 fun ListScreen(
     activeRow: Int,
-    stateListArt: LazyPagingItems<DataArtElement>,
+    listArtPagingItems: LazyPagingItems<DataArtElement>,
     navController: NavController,
 ) {
     // keep the scrolling state upon screen rotation
@@ -57,8 +57,8 @@ fun ListScreen(
             //    TableItemRow(item)
             //}
             //}
-            itemsIndexed(stateListArt.itemSnapshotList) { index, _ ->
-                stateListArt[index]?.let { TableItemRow(activeRow = activeRow, item = it, index = index, navController = navController) }
+            itemsIndexed(listArtPagingItems.itemSnapshotList) { index, _ ->
+                listArtPagingItems[index]?.let { TableItemRow(activeRow = activeRow, item = it, index = index, navController = navController) }
             }
         }
     }

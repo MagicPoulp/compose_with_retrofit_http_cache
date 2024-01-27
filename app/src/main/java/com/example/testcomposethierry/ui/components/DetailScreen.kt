@@ -16,7 +16,7 @@ import kotlinx.coroutines.withContext
 
 @Composable
 fun DetailScreen(
-    stateListArt: LazyPagingItems<DataArtElement>,
+    listArtPagingItems: LazyPagingItems<DataArtElement>,
     rowId: Int,
     artViewModel: ArtViewModel,
 ) {
@@ -41,7 +41,7 @@ fun DetailScreen(
             // the Default dispatcher is used by default by LaunchedEffect
             // we do not need the IO dispatcher, because we need the result fast and the Default
             // is prioritized
-            val newDetail = artViewModel.refetchArtDetail(rowId, stateListArt)
+            val newDetail = artViewModel.refetchArtDetail(rowId, listArtPagingItems)
             newDetail?.let { detail ->
                 artViewModel.setActiveDetailData(detail)
             }

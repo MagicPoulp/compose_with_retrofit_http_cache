@@ -7,6 +7,7 @@ import androidx.lifecycle.testing.TestLifecycleOwner
 import app.cash.turbine.test
 import com.example.testcomposethierry.data.repositories.ArtDataRepository
 import com.example.testcomposethierry.data.repositories.PersistentDataManager
+import com.example.testcomposethierry.domain.network.RefetchArtDetailUseCase
 import com.example.testcomposethierry.ui.view_models.ArtViewModel
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.CoroutineScope
@@ -61,11 +62,11 @@ class ExampleUnitTest {
         //{
             //onBlocking { getPokemon() } doReturn testingPokemonList
         //}
-        val persistentDataManager = mock<PersistentDataManager>()
+        val refetchArtDetailUseCase = mock<RefetchArtDetailUseCase>()
         //{
            // on { invoke(any()) } doReturn testingPokemonDetails
         //}
-        artViewModel = ArtViewModel(artDataRepository, persistentDataManager)
+        artViewModel = ArtViewModel(artDataRepository, refetchArtDetailUseCase)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

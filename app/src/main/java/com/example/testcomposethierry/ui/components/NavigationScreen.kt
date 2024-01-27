@@ -23,24 +23,29 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import com.example.testcomposethierry.data.models.DataArtElement
 import com.example.testcomposethierry.ui.setup.RoutingScreen
 import com.example.testcomposethierry.ui.view_models.ArtViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun NavigationScreen(
     activity: ComponentActivity,
-    stateListArt: LazyPagingItems<DataArtElement>,
-    artViewModel: ArtViewModel,
+    listArtPagingItems: LazyPagingItems<DataArtElement>,
+    artElementIndexesToProcess: Channel<Pair<Int, String>>,
+    artViewModel: ArtViewModel = hiltViewModel(),
 ) {
+    artViewModel.startDataSaving(activity, artElementIndexesToProcess)
     val navController = rememberNavController()
-    navController.addOnDestinationChangedListener { controller, destination, args ->
+    navController.addOnDestinationChangedListener { _, destination, _ ->
         CoroutineScope(Dispatchers.IO).launch {
             // needed to avoid seeing the old text in the Detail Screen
             // but we cannot set null when navigating to the Detail screen or it interfers with the data
@@ -100,7 +105,7 @@ fun NavigationScreen(
             composable(RoutingScreen.MyListScreen.route) {
                 ListScreen(
                     activeRow = activeRow,
-                    stateListArt = stateListArt,
+                    listArtPagingItems = listArtPagingItems,
                     navController = navController,
 
                 )
@@ -114,7 +119,7 @@ fun NavigationScreen(
                 } catch (_: Exception) {
                     previousRow
                 }
-                DetailScreen(stateListArt = stateListArt, rowId = rowId, artViewModel = artViewModel)
+                DetailScreen(listArtPagingItems = listArtPagingItems, rowId = rowId, artViewModel = artViewModel)
                 // This LaunchedEffect is needed to mark in grey the active row in the main list
                 LaunchedEffect(Unit) {
                     // we need a small delay so that we do not see the clicked row as active
