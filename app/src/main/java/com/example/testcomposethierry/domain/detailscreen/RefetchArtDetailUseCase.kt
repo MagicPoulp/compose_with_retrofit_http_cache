@@ -1,4 +1,4 @@
-package com.example.testcomposethierry.domain.network
+package com.example.testcomposethierry.domain.detailscreen
 
 import androidx.paging.compose.LazyPagingItems
 import com.example.testcomposethierry.data.custom_structures.ResultOf

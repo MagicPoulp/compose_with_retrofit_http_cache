@@ -79,7 +79,7 @@ fun UiStateScreen(
                 UiState.Filled -> NavigationScreen(
                     activity = activity,
                     listArtPagingItems = listArtPagingItems,
-                    artElementIndexesToProcess = uiStateScreenViewModel.artElementIndexesToProcess,
+                    channelIndexesToPrefetch = uiStateScreenViewModel.channelIndexesToPrefetch,
                 )
                 is UiState.Error -> ErrorScreen(state)
                 else -> Row {

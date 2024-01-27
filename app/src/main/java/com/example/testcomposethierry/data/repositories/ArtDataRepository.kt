@@ -6,13 +6,13 @@ import com.example.testcomposethierry.data.http.ArtApi
 import com.example.testcomposethierry.data.http.RetrofitHelper
 import com.example.testcomposethierry.data.models.DataArtDetail
 import com.example.testcomposethierry.data.models.DataArtElement
-import com.example.testcomposethierry.domain.ExtractDataArtUseCase
+import com.example.testcomposethierry.domain.artdatarepository.ExtractDataArtUseCase
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class ArtDataRepository @Inject constructor(
-    val extractDataArtUseCase: ExtractDataArtUseCase,
+    private val extractDataArtUseCase: ExtractDataArtUseCase,
     private val retrofitHelper: RetrofitHelper,
 ) {
 

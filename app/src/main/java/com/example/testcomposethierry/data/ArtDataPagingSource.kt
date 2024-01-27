@@ -1,15 +1,14 @@
-package com.example.testcomposethierry.data.repositories
+package com.example.testcomposethierry.data
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.testcomposethierry.data.config.AppConfig
 import com.example.testcomposethierry.data.custom_structures.ResultOf
 import com.example.testcomposethierry.data.models.DataArtElement
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.trySendBlocking
+import com.example.testcomposethierry.data.repositories.ArtDataRepository
 
 // https://betterprogramming.pub/turn-the-page-overview-of-android-paging3-library-integration-with-jetpack-compose-3a7881ed75b4
-class ArtDataPagingSource (
+class ArtDataPagingSource(
     private val unexpectedServerDataErrorString: String,
     private val artDataRepository: ArtDataRepository,
 ) : PagingSource<Int, DataArtElement>() {
@@ -28,7 +27,7 @@ class ArtDataPagingSource (
                 // After filtering the duplicates. It is important to have a correct index
                 response.value.forEachIndexed { index, v ->
                     val elementGlobalIndex = index + pagingSize * nextPageNumber
-                    v.objectNumber?.let { artElementIndexesToProcess.send(Pair(elementGlobalIndex, v.objectNumber)) }
+                    v.objectNumber?.let { channelIndexesToPrefetch.send(Pair(elementGlobalIndex, v.objectNumber)) }
                 }*/
                 LoadResult.Page(
                     data = response.value,

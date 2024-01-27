@@ -39,11 +39,11 @@ import kotlin.time.Duration.Companion.milliseconds
 fun NavigationScreen(
     activity: ComponentActivity,
     listArtPagingItems: LazyPagingItems<DataArtElement>,
-    artElementIndexesToProcess: Channel<Pair<Int, String>>,
+    channelIndexesToPrefetch: Channel<Pair<Int, String>>,
     listScreenViewModel: ListScreenViewModel = hiltViewModel(),
     detailScreenViewModel: DetailScreenViewModel = hiltViewModel(),
 ) {
-    detailScreenViewModel.startDataSaving(activity, artElementIndexesToProcess)
+    detailScreenViewModel.startDataSaving(activity, channelIndexesToPrefetch)
     val navController = rememberNavController()
     navController.addOnDestinationChangedListener { _, destination, _ ->
         CoroutineScope(Dispatchers.IO).launch {
