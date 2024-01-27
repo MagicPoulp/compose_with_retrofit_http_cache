@@ -1,4 +1,4 @@
-package com.example.testcomposethierry.ui.components
+package com.example.testcomposethierry.ui.components.uistate
 
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
@@ -20,14 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
-import androidx.paging.PagingSource
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.testcomposethierry.R
-import com.example.testcomposethierry.ui.view_models.ArtViewModel
+import com.example.testcomposethierry.ui.components.NavigationScreen
 import com.example.testcomposethierry.ui.view_models.UiState
-import com.example.testcomposethierry.ui.view_models.UiStateViewModel
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.launch
+import com.example.testcomposethierry.ui.view_models.UiStateScreenViewModel
 
 @Composable
 fun UiStateScreen(
@@ -58,15 +55,15 @@ fun UiStateScreen(
     And observe that the hilt view model survives the configuration change.
     Because the init from the constructor call is not called more than once.
     */
-    uiStateViewModel: UiStateViewModel = hiltViewModel(),
+    uiStateScreenViewModel: UiStateScreenViewModel = hiltViewModel(),
     activity: ComponentActivity,
 ) {
     val unexpectedServerDataErrorString = activity.resources.getString(R.string.unexpected_server_data)
-    uiStateViewModel.startPagerAndDataFetching(
+    uiStateScreenViewModel.startPagerAndDataFetching(
         unexpectedServerDataErrorString = unexpectedServerDataErrorString,
     )
-    val state by uiStateViewModel.uiState.collectAsStateWithLifecycle()
-    val listArtPagingItems = uiStateViewModel.listArt.collectAsLazyPagingItems()
+    val state by uiStateScreenViewModel.uiState.collectAsStateWithLifecycle()
+    val listArtPagingItems = uiStateScreenViewModel.listArt.collectAsLazyPagingItems()
     Box(contentAlignment = Alignment.TopCenter,
         modifier = Modifier
             .background(MaterialTheme.colors.secondary)
@@ -82,7 +79,7 @@ fun UiStateScreen(
                 UiState.Filled -> NavigationScreen(
                     activity = activity,
                     listArtPagingItems = listArtPagingItems,
-                    artElementIndexesToProcess = uiStateViewModel.artElementIndexesToProcess,
+                    artElementIndexesToProcess = uiStateScreenViewModel.artElementIndexesToProcess,
                 )
                 is UiState.Error -> ErrorScreen(state)
                 else -> Row {
@@ -108,11 +105,11 @@ fun UiStateScreen(
             LaunchedEffect(listArtPagingItems.loadState) {
                 listArtPagingItems.apply {
                     if (loadState.refresh is LoadState.Error) {
-                        uiStateViewModel.setUiState(UiState.Error((loadState.refresh as LoadState.Error).error))
+                        uiStateScreenViewModel.setUiState(UiState.Error((loadState.refresh as LoadState.Error).error))
                         return@apply
                     }
                     if (loadState.append is LoadState.Error) {
-                        uiStateViewModel.setUiState(UiState.Error((loadState.append as LoadState.Error).error))
+                        uiStateScreenViewModel.setUiState(UiState.Error((loadState.append as LoadState.Error).error))
                         return@apply
                     }
                 }
@@ -132,7 +129,7 @@ fun UiStateScreen(
                             0 -> UiState.Empty
                             else -> UiState.Filled
                         }
-                        uiStateViewModel.setUiState(newState)
+                        uiStateScreenViewModel.setUiState(newState)
                     }
             }
         }

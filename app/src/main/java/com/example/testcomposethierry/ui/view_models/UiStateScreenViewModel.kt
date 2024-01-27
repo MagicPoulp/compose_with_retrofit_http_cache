@@ -1,6 +1,5 @@
 package com.example.testcomposethierry.ui.view_models
 
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -14,20 +13,17 @@ import com.example.testcomposethierry.data.config.AppConfig
 import com.example.testcomposethierry.data.models.DataArtElement
 import com.example.testcomposethierry.data.repositories.ArtDataPagingSource
 import com.example.testcomposethierry.data.repositories.ArtDataRepository
-import com.example.testcomposethierry.domain.network.RefetchArtDetailUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.shareIn
 import javax.inject.Inject
 
 @HiltViewModel
-class UiStateViewModel @Inject constructor(
+class UiStateScreenViewModel @Inject constructor(
     private val artDataRepository: ArtDataRepository,
 ) : ViewModel()
 {
@@ -40,6 +36,9 @@ class UiStateViewModel @Inject constructor(
 
     lateinit var listArt: Flow<PagingData<DataArtElement>>
     private var isPagerinitialized = false
+    // unbuffered channel, needed for concurrency data
+    // there is no reason to limit the size of the channel, because we consume it on a limited number of tasks
+    // limiting this size, could theoretically block the repository function that sends.
     val artElementIndexesToProcess = Channel<Pair<Int, String>>(Channel.UNLIMITED)
 
     // ------------------------------------------

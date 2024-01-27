@@ -14,9 +14,11 @@ and I explained why the boolean is necessary.
 --> refetchArtDetail should lie in a use case
 Done
 
-Ramaining:
-
 --> use many view models
+
+Done
+
+Remaining:
 
 --> add use cases
 
