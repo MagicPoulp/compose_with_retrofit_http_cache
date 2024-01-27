@@ -12,7 +12,6 @@ import kotlinx.coroutines.channels.trySendBlocking
 class ArtDataPagingSource (
     private val unexpectedServerDataErrorString: String,
     private val artDataRepository: ArtDataRepository,
-    private val artElementIndexesToProcess: Channel<Pair<Int, String>>,
 ) : PagingSource<Int, DataArtElement>() {
 
     override suspend fun load(params: LoadParams<Int>):  LoadResult<Int, DataArtElement> {

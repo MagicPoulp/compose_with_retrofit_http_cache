@@ -25,6 +25,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.testcomposethierry.R
 import com.example.testcomposethierry.ui.view_models.ArtViewModel
 import com.example.testcomposethierry.ui.view_models.UiState
+import com.example.testcomposethierry.ui.view_models.UiStateViewModel
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 
@@ -57,16 +58,15 @@ fun UiStateScreen(
     And observe that the hilt view model survives the configuration change.
     Because the init from the constructor call is not called more than once.
     */
-    artViewModel: ArtViewModel = hiltViewModel(),
+    uiStateViewModel: UiStateViewModel = hiltViewModel(),
     activity: ComponentActivity,
 ) {
     val unexpectedServerDataErrorString = activity.resources.getString(R.string.unexpected_server_data)
-    artViewModel.startPagerAndDataFetching(
+    uiStateViewModel.startPagerAndDataFetching(
         unexpectedServerDataErrorString = unexpectedServerDataErrorString,
-        owner = activity,
     )
-    val state by artViewModel.uiState.collectAsStateWithLifecycle()
-    val stateListArt = artViewModel.listArt.collectAsLazyPagingItems()
+    val state by uiStateViewModel.uiState.collectAsStateWithLifecycle()
+    val listArtPagingItems = uiStateViewModel.listArt.collectAsLazyPagingItems()
     Box(contentAlignment = Alignment.TopCenter,
         modifier = Modifier
             .background(MaterialTheme.colors.secondary)
@@ -79,13 +79,16 @@ fun UiStateScreen(
             when (state) {
                 // put each case here on ErrorScreen() to debug the error screen
                 is UiState.Empty -> ProgressIndicator()
-                UiState.Filled -> NavigationScreen(activity = activity, stateListArt = stateListArt, artViewModel = artViewModel)
+                UiState.Filled -> NavigationScreen(
+                    activity = activity,
+                    listArtPagingItems = listArtPagingItems,
+                    artElementIndexesToProcess = uiStateViewModel.artElementIndexesToProcess,
+                )
                 is UiState.Error -> ErrorScreen(state)
                 else -> Row {
                     ProgressIndicator()
                 }
             }
-
             /*
             LoadResult.Error will result in a changed stateListArt.loadState
             If the lazy loading has an error state, we update the UI State to an error
@@ -102,14 +105,14 @@ fun UiStateScreen(
                  val throwable: Throwable
              ) : PagingSource.LoadResult<Key, Value>()
             */
-            LaunchedEffect(stateListArt.loadState) {
-                stateListArt.apply {
+            LaunchedEffect(listArtPagingItems.loadState) {
+                listArtPagingItems.apply {
                     if (loadState.refresh is LoadState.Error) {
-                        artViewModel.setUiState(UiState.Error((loadState.refresh as LoadState.Error).error))
+                        uiStateViewModel.setUiState(UiState.Error((loadState.refresh as LoadState.Error).error))
                         return@apply
                     }
                     if (loadState.append is LoadState.Error) {
-                        artViewModel.setUiState(UiState.Error((loadState.append as LoadState.Error).error))
+                        uiStateViewModel.setUiState(UiState.Error((loadState.append as LoadState.Error).error))
                         return@apply
                     }
                 }
@@ -119,9 +122,9 @@ fun UiStateScreen(
             // LazyPagingItems cannot be collected in the ViewModel, but it can be in a LaunchedEffect
             // https://developer.android.com/jetpack/compose/side-effects#snapshotFlow
             LaunchedEffect(Unit) {
-                snapshotFlow { stateListArt.itemSnapshotList.count() }
+                snapshotFlow { listArtPagingItems.itemSnapshotList.count() }
                     .collect { listSize ->
-                        val loadState = stateListArt.loadState
+                        val loadState = listArtPagingItems.loadState
                         if (loadState.refresh is LoadState.Error || loadState.append is LoadState.Error) {
                             return@collect
                         }
@@ -129,7 +132,7 @@ fun UiStateScreen(
                             0 -> UiState.Empty
                             else -> UiState.Filled
                         }
-                        artViewModel.setUiState(newState)
+                        uiStateViewModel.setUiState(newState)
                     }
             }
         }

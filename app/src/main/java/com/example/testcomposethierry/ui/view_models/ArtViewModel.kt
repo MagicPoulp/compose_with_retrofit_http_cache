@@ -64,18 +64,6 @@ class ArtViewModel @Inject constructor(
     private val artDataRepository: ArtDataRepository,
     private val refetchArtDetailUseCase: RefetchArtDetailUseCase,
 ) : ViewModel() {
-    // ------------------------------------------
-    // user data variables
-    // the list of packages installed on the device
-    lateinit var listArt: Flow<PagingData<DataArtElement>>
-    private val mapArtDetail: MutableMap<Int, DataArtDetail> = hashMapOf()
-
-    // ------------------------------------------
-    // UI state variables
-    // The UI state for showing the first page with a spinner or not
-    private val _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState.Empty)
-    val uiState: StateFlow<UiState>
-        get() = _uiState.asStateFlow()
     private val _activeRow: MutableStateFlow<Int> = MutableStateFlow(-1)
     val activeRow: StateFlow<Int>
         get() = _activeRow.asStateFlow()
@@ -87,61 +75,16 @@ class ArtViewModel @Inject constructor(
     // limiting this size, could theoretically block the repository function that sends.
     private val artElementIndexesToProcess = Channel<Pair<Int, String>>(Channel.UNLIMITED)
     private val numberOfConcurrentDetailPrefetching = 10
+    private val mapArtDetail: MutableMap<Int, DataArtDetail> = hashMapOf()
+    private var isDataSavinginitialized = false
 
-    // ------------------------------------------
-    // init variables
-    private var isPagerinitialized = false
-
-    // the view model survives configuration changes
-    // But an activity stop will release the resources to free memory
-    override fun onCleared() {
-        super.onCleared()
-        artElementIndexesToProcess.cancel()
-        artDataRepository.onDestroy()
-    }
-
-    /*
-      This startPagerAndDataFetching() function is not from the constructor, it is called manually the first time UiStateScreen is composed.
-      And the initialized boolean prevents running more code in case of recomposition when the UI state changes.
-      we need the activity instance to call this code.
-      Note that even if we create the view model in the activity and call this startPagerAndDataFetching() function from the
-      activity, recomposition or configuration change is possible and we need the initialized boolean anyways.
-    * */
-    fun startPagerAndDataFetching(unexpectedServerDataErrorString: String, owner: LifecycleOwner) {
-        if (isPagerinitialized) {
+    fun startDataSaving(
+        owner: LifecycleOwner,
+        artElementIndexesToProcess: Channel<Pair<Int, String>>) {
+        if (isDataSavinginitialized) {
             return
         }
-        isPagerinitialized = true
-
-        // one can add a RemoteMediator for caching
-        // https://developer.android.com/topic/libraries/architecture/paging/v3-network-db
-        listArt = Pager(PagingConfig(pageSize = AppConfig.pagingSize)) {
-            ArtDataPagingSource(unexpectedServerDataErrorString, artDataRepository, artElementIndexesToProcess)
-        }.flow
-            .map { pagingData ->
-                // This filtering is optional, it is just because the API send us duplicates.
-                // We filter duplicate object numbers.
-                // https://stackoverflow.com/questions/69284841/how-to-avoid-duplicate-items-in-pagingadapter
-                // The museum API has a bug since duplicate pages can be returned
-                // the 2 following calls give duplicates, and then the next pages are totally distinct
-                // curl https://www.rijksmuseum.nl/api/en/collection?key=rIl6yb6x\&ps=3\&p=0
-                // curl https://www.rijksmuseum.nl/api/en/collection?key=rIl6yb6x\&ps=3\&p=1
-                val objectNumbersHashSet = hashSetOf<String>()
-                val pagingDataWithoutDuplicates = pagingData.filter { elem ->
-                    elem.objectNumber?.let { objectNumbersHashSet.add(elem.objectNumber) } ?: false
-                }
-                var itemIndex = -1
-                pagingDataWithoutDuplicates.map { elem ->
-                    itemIndex += 1
-                    elem.objectNumber?.let {
-                        // We send to the Channel the IDs that need to be prefetched for getting the detail data
-                        artElementIndexesToProcess.send(Pair(itemIndex, elem.objectNumber))
-                    }
-                    elem
-                }
-            }
-            .cachedIn(viewModelScope)
-
+        isDataSavinginitialized = true
         // the repeatOnLifecycle is here to stop consuming resources when the app goes in background
         // it does not matter if we drop certain elements, because we refetch details if we click
         owner.lifecycleScope.launch(Dispatchers.IO) {
@@ -152,6 +95,8 @@ class ArtViewModel @Inject constructor(
             }
         }
     }
+
+    // ------------------------------------------
 
     private fun consumeChannelAndPrefetchInParallel(channel: Channel<Pair<Int, String>>): Flow<Unit> {
         val receiveFlow = channel.receiveAsFlow()
@@ -185,15 +130,6 @@ class ArtViewModel @Inject constructor(
     fun setActiveRow(owner: LifecycleOwner, rowId: Int) {
         owner.lifecycleScope.launch {
             _activeRow.emit(rowId)
-        }
-    }
-
-    suspend fun setUiState(newUiState: UiState) {
-        if (BuildConfig.DEBUG && newUiState is UiState.Error) {
-            println(newUiState.error.message)
-        }
-        if (newUiState != _uiState) {
-            _uiState.emit(newUiState)
         }
     }
 
