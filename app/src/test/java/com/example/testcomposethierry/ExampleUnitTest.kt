@@ -43,7 +43,6 @@ testLifecycleOwner = TestLifecycleOwner()
 class ExampleUnitTest {
 
     lateinit var detailScreenViewModel: DetailScreenViewModel
-    lateinit var getDetailDataInParallelUseCase: GetDetailDataInParallelUseCase
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @BeforeEach
