@@ -24,6 +24,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.paging.compose.LazyPagingItems
+import com.example.testcomposethierry.R
 import com.example.testcomposethierry.data.models.DataUsersListElement
 import com.example.testcomposethierry.ui.setup.RoutingScreen
 import com.example.testcomposethierry.ui.view_models.DetailScreenViewModel
@@ -40,6 +41,8 @@ fun NavigationScreen(
     listScreenViewModel: ListScreenViewModel = hiltViewModel(),
     detailScreenViewModel: DetailScreenViewModel = hiltViewModel(),
 ) {
+    val internetConnectivityErrorString = activity.resources.getString(R.string.internet_connectivity_error)
+    listScreenViewModel.prepareInternetConnectivityErrorToaster(activity, internetConnectivityErrorString)
     val navController = rememberNavController()
     navController.addOnDestinationChangedListener { _, destination, _ ->
         CoroutineScope(Dispatchers.IO).launch {
