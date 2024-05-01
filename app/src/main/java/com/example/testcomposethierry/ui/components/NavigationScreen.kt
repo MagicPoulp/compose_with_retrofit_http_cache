@@ -30,10 +30,8 @@ import com.example.testcomposethierry.ui.view_models.DetailScreenViewModel
 import com.example.testcomposethierry.ui.view_models.ListScreenViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun NavigationScreen(

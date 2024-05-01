@@ -108,7 +108,7 @@ fun UiStateScreen(
                         return@apply
                     }
                     if (loadState.append is LoadState.Error) {
-                        uiStateScreenViewModel.setUiState(UiState.Error((loadState.append as LoadState.Error).error))
+                        //uiStateScreenViewModel.setUiState(UiState.Error((loadState.append as LoadState.Error).error))
                         return@apply
                     }
                 }
