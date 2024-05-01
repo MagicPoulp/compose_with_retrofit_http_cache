@@ -18,7 +18,7 @@ I was relaxed during a public holiday.
 
 Classic :
 
-A classic clean Architecture is used with use cases.
+A classic clean Architecture is used with use cases, and a repository.
 One view model for the state with a loader
 One view model for the Users List.
 Data is fetched using retrofit and the JSON is parsed. Jetpack component Paging3 is used to load the page lazily.
@@ -31,6 +31,7 @@ I added a mechanism to detect internet connectivity. In addition, since it is no
 
 - explain where you applied some developers' good practices: design pattern, SOLID, KISS, DRY principles, etc...
 
+The result pattern, and the use case screen pattern are used to show screens of error, loading, or content.
 I use the clean architecture with different view models and use cases.
 I already have a git repository with a sofisticated and optimized prefetching of detailed data. Here I wanted to be as simple as possible.
 I in SOLID, we need many interfaces to fetch the data. Hence, a potential need for detailed user data would need a new API call.
@@ -48,8 +49,11 @@ I did not use a library for caching (https://github.com/ncornette/OkCacheControl
 
     - your commits strategy
 
-doc dommits and big fundamental steps
+There are commits of 2 kings, doc commits and big fundamental steps.
+However, I am used to follow standard prefixes, such as build, bump, ci, deps(add|change|remove), docs, enabler, feat(add|change|remove), fixbug, refactor, test.
 
 - explain if your code is future-proof (scalable, robust to changes, etc...)
 
 Following the clean architecture makes the project robust to change.
+The setup is in place (see NavigationScreen) to navigate across multiple pages
+

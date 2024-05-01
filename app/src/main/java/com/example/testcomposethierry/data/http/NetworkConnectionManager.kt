@@ -30,33 +30,18 @@ import javax.net.ssl.SSLSocketFactory
 // https://medium.com/@rawatsumit115/smart-way-to-observe-internet-connection-for-whole-app-in-android-kotlin-bd77361c76fb
 // https://medium.com/@veniamin.vynohradov/monitoring-internet-connection-state-in-android-da7ad915b5e5
 
-interface NetworkConnectionManager {
-    val isConnected: StateFlow<Boolean>
-    val isInitialized: Boolean
-    fun checkAgainInternet()
-    fun unregister()
-}
-
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class NetworkConnectionManagerModule {
-
-    @Binds
-    abstract fun bind(impl: InternetConnectionObserver): NetworkConnectionManager
+class NetworkConnectionManagerModule {
+    @Provides
+    @Singleton // declares scoped singleton
+    fun provideNetworkConnectionManager(@ApplicationContext appContext: Context): NetworkConnectionManager {
+        val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+        return NetworkConnectionManagerImpl(appContext, coroutineScope, false)
+    }
 }
 
 // https://medium.com/androiddevelopers/create-an-application-coroutinescope-using-hilt-dd444e721528
-@InstallIn(SingletonComponent::class)
-@Module
-object CoroutinesScopesModule {
-
-    @Singleton // Provide always the same instance
-    @Provides
-    fun providesCoroutineScope(): CoroutineScope {
-        // Run this code when providing an instance of CoroutineScope
-        return CoroutineScope(SupervisorJob() + Dispatchers.Default)
-    }
-}
 
 object DoesNetworkHaveInternet {
     // Make sure to execute this on a background thread.
@@ -67,7 +52,7 @@ object DoesNetworkHaveInternet {
             socket.close()
             //Log.d(this.javaClass.name, "PING success.")
             true
-        }catch (e: IOException){
+        } catch (e: IOException){
             //Log.e(this.javaClass.name, "No internet connection.")
             false
         }
@@ -79,10 +64,18 @@ interface InternetConnectionCallback {
     fun onDisconnected()
 }
 
+interface NetworkConnectionManager {
+    val isConnected: StateFlow<Boolean>
+    val isInitialized: Boolean
+    fun checkAgainInternet()
+    fun unregister()
+}
+
 @Singleton
-class InternetConnectionObserver @Inject constructor(
+class NetworkConnectionManagerImpl @Inject constructor(
     @ApplicationContext context: Context,
-    private val coroutineScope: CoroutineScope
+    private val coroutineScope: CoroutineScope,
+    private val unitTestMode: Boolean = false
 ) : NetworkConnectionManager {
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
     private var cm: ConnectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -95,7 +88,11 @@ class InternetConnectionObserver @Inject constructor(
 
     init {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            register()
+            // a boolean for a test mode is needed here to make the code testable
+            // because due to the test environment, addCapability() on a network parameters returns null
+            if (!unitTestMode) {
+                register()
+            }
             setCallback(object : InternetConnectionCallback {
                 override fun onConnected() {
                     _isConnected.tryEmit(true)
@@ -127,7 +124,7 @@ class InternetConnectionObserver @Inject constructor(
                 // check if this network actually has internet
                 coroutineScope.launch {
                     val hasInternet = DoesNetworkHaveInternet.execute(network.socketFactory)
-                    if (hasInternet){
+                    if (hasInternet) {
                         withContext(Dispatchers.IO) {
                             validNetworks.add(network)
                             checkValidNetworks()
@@ -152,7 +149,7 @@ class InternetConnectionObserver @Inject constructor(
 
     private fun checkValidNetworks() {
         val status = validNetworks.size > 0
-        if(status){
+        if (status){
             connectionCallback?.onConnected()
         } else{
             connectionCallback?.onDisconnected()
@@ -167,7 +164,7 @@ class InternetConnectionObserver @Inject constructor(
         cm.registerNetworkCallback(networkRequest, networkCallback)
     }
 
-    fun unRegister(){
+    override fun unregister(){
         cm.unregisterNetworkCallback(networkCallback)
     }
 

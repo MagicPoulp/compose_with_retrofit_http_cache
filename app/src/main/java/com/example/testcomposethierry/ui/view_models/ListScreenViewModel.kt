@@ -41,6 +41,7 @@ class ListScreenViewModel @Inject constructor(
 
     fun prepareInternetConnectivityErrorToaster(activity: Activity, internetConnectivityErrorString: String) {
         val owner = activity as LifecycleOwner
+        // this allows to pause during configuration changes, and when the app goes in the background
         owner.lifecycleScope.launch(Dispatchers.IO) {
             owner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 networkConnectionManager.isConnected
