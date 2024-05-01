@@ -8,7 +8,7 @@ import com.example.testcomposethierry.data.models.DataArtElement
 import com.example.testcomposethierry.data.repositories.ArtDataRepository
 
 // https://betterprogramming.pub/turn-the-page-overview-of-android-paging3-library-integration-with-jetpack-compose-3a7881ed75b4
-class ArtDataPagingSource(
+class UsersDataPagingSource(
     private val unexpectedServerDataErrorString: String,
     private val artDataRepository: ArtDataRepository,
 ) : PagingSource<Int, DataArtElement>() {
@@ -21,14 +21,7 @@ class ArtDataPagingSource(
             // Try this line below to test the LaunchEffect(LaunchedEffect(stateListArt.loadState) {)
             // is ResultOf.Success -> LoadResult.Error(Exception(unexpectedServerDataErrorString))
             is ResultOf.Success -> if (response.value.isEmpty()) LoadResult.Error(Exception(unexpectedServerDataErrorString)) else {
-                /*
-                // commented code below because the sending to the Channel to fetch the detail data was moved to the ViewModel,
-                // because filtering had to be done
-                // After filtering the duplicates. It is important to have a correct index
-                response.value.forEachIndexed { index, v ->
-                    val elementGlobalIndex = index + pagingSize * nextPageNumber
-                    v.objectNumber?.let { channelIndexesToPrefetch.send(Pair(elementGlobalIndex, v.objectNumber)) }
-                }*/
+                // here we could prefetch detail data for each element on another API point
                 LoadResult.Page(
                     data = response.value,
                     prevKey = if (nextPageNumber > 1) nextPageNumber - 1 else null,

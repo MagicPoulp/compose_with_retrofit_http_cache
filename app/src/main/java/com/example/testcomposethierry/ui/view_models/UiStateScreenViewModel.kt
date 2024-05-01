@@ -6,27 +6,21 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import androidx.paging.filter
-import androidx.paging.map
 import com.example.testcomposethierry.BuildConfig
 import com.example.testcomposethierry.data.config.AppConfig
 import com.example.testcomposethierry.data.models.DataArtElement
-import com.example.testcomposethierry.data.ArtDataPagingSource
+import com.example.testcomposethierry.data.UsersDataPagingSource
 import com.example.testcomposethierry.data.repositories.ArtDataRepository
-import com.example.testcomposethierry.domain.uistate.FilterPagingDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @HiltViewModel
 class UiStateScreenViewModel @Inject constructor(
     private val artDataRepository: ArtDataRepository,
-    private val filterPagingDataUseCase: FilterPagingDataUseCase,
 ) : ViewModel()
 {
     // UI state variables
@@ -37,10 +31,6 @@ class UiStateScreenViewModel @Inject constructor(
 
     lateinit var listArt: Flow<PagingData<DataArtElement>>
     private var isPagerinitialized = false
-    // unbuffered channel, needed for concurrency data
-    // there is no reason to limit the size of the channel, because we consume it on a limited number of tasks
-    // limiting this size, could theoretically block the repository function that sends.
-    val channelIndexesToPrefetch = Channel<Pair<Int, String>>(Channel.UNLIMITED)
 
     // ------------------------------------------
 
@@ -71,22 +61,11 @@ class UiStateScreenViewModel @Inject constructor(
         // or one can use the caching of HTTP requests themselves as we did in this project
         // (see PersistentDataManager)
         listArt = Pager(PagingConfig(pageSize = AppConfig.pagingSize)) {
-            ArtDataPagingSource(unexpectedServerDataErrorString, artDataRepository)
+            UsersDataPagingSource(unexpectedServerDataErrorString, artDataRepository)
         }
             .flow
-            .map { pagingData -> filterPagingDataUseCase(pagingData, channelIndexesToPrefetch) }
             // The cachedIn() operator makes the data stream shareable and caches the loaded data with the provided CoroutineScope. In any configuration change, it will provide the existing data instead of getting the data from scratch. It will also prevent memory leak.
             // https://medium.com/huawei-developers/what-is-paging3-mvvm-flow-databinding-hilt-d4fe6b1b11ec
             .cachedIn(viewModelScope)
-    }
-
-    // we use the top level view model to run destruction
-    // kotlin/ has no destructors, but the view model has onCleared()
-    // the view model survives configuration changes
-    // But an activity stop will release the resources to free memory
-    override fun onCleared() {
-        super.onCleared()
-        channelIndexesToPrefetch.cancel()
-        artDataRepository.onDestroy()
     }
 }

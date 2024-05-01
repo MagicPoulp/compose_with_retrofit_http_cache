@@ -2,7 +2,7 @@ package com.example.testcomposethierry.data.repositories
 
 import com.example.testcomposethierry.data.config.AppConfig
 import com.example.testcomposethierry.data.custom_structures.ResultOf
-import com.example.testcomposethierry.data.http.ArtApi
+import com.example.testcomposethierry.data.http.UsersApi
 import com.example.testcomposethierry.data.http.RetrofitHelper
 import com.example.testcomposethierry.data.models.DataArtDetail
 import com.example.testcomposethierry.data.models.DataArtElement
@@ -16,7 +16,7 @@ class ArtDataRepository @Inject constructor(
     private val retrofitHelper: RetrofitHelper,
 ) {
 
-    private lateinit var api: ArtApi
+    private lateinit var api: UsersApi
     private var initialized = false
     private val apiKey = AppConfig.apiKey
 
@@ -25,7 +25,7 @@ class ArtDataRepository @Inject constructor(
             baseUrl = AppConfig.artBaseUrl,
             okHttpClient = null,
             requestHeaders = null
-        ).create(ArtApi::class.java)
+        ).create(UsersApi::class.java)
     }
 
     suspend fun getArtPaged(pageSize: Int, pageOffset: Int): ResultOf<List<DataArtElement>> {
@@ -70,9 +70,5 @@ class ArtDataRepository @Inject constructor(
             }
         }
         return ResultOf.Failure(response.message(), null)
-    }
-
-    fun onDestroy() {
-        retrofitHelper.onDestroy()
     }
 }
