@@ -32,17 +32,17 @@ fun DetailScreen(
         // if there is no detail data from the mechanism with the Channel,
         // we fetch the detail data directly
         // Afterwards, we set activeDetailData
-        val artDetail = detailScreenViewModel.getSavedArtDetail(rowId)
-        artDetail?.let {
-            detailScreenViewModel.setActiveDetailData(artDetail)
-        } ?: run {
+        //val artDetail = detailScreenViewModel.getSavedArtDetail(rowId)
+        //artDetail?.let {
+        //    detailScreenViewModel.setActiveDetailData(artDetail)
+        // } ?: run {
             // the Default dispatcher is used by default by LaunchedEffect
             // we do not need the IO dispatcher, because we need the result fast and the Default
             // is prioritized
-            val newDetail = detailScreenViewModel.refetchArtDetail(rowId, listArtPagingItems)
-            newDetail?.let { detail ->
-                detailScreenViewModel.setActiveDetailData(detail)
-            }
-        }
+            //val newDetail = detailScreenViewModel.refetchArtDetail(rowId, listArtPagingItems)
+            //newDetail?.let { detail ->
+            //    detailScreenViewModel.setActiveDetailData(detail)
+            //}
+        //}
     }
 }

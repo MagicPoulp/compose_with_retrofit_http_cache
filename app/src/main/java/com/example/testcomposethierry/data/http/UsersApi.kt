@@ -13,7 +13,7 @@ import retrofit2.http.Query
 // https://randomuser.me/documentation
 // example of use:
 // https://randomuser.me/api/?inc=name,email&results=10&page=1&seed=merlin
-interface ArtApi {
+interface UsersApi {
     @GET("/api/en/collection")
     suspend fun getArtPaged(@Query("key") key: String, @Query("ps") pageSize: Int, @Query("p") pageOffset: Int): Response<DataArtFull>
 

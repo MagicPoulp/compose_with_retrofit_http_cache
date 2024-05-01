@@ -19,13 +19,7 @@ import javax.inject.Inject
 // add a header:
 // https://stackoverflow.com/questions/32605711/adding-header-to-all-request-with-retrofit-2
 class RetrofitHelper @Inject constructor(
-    private val persistentHttpDataManager: PersistentHttpDataManager,
 ) {
-
-    fun onDestroy() {
-        persistentHttpDataManager.close()
-    }
-
     // we can specify the base url, the max number of concurrent connections, and an extra API key header
     fun getInstance(baseUrl: String, okHttpClient: OkHttpClient?, requestHeaders: List<Pair<String, String>>?): Retrofit {
 
@@ -69,8 +63,6 @@ class RetrofitHelper @Inject constructor(
                 //persistentHttpDataManager.loadResponse(request.url.toString(), request, response)
             }
             response
-            // how to test: to develop without using the server, use this
-            //persistentDataManager.loadResponse(request.url.toString(), request, response)
         })
 
         requestHeaders?.let {
