@@ -24,7 +24,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.paging.compose.LazyPagingItems
-import com.example.testcomposethierry.data.models.DataArtElement
+import com.example.testcomposethierry.data.models.DataUsersListElement
 import com.example.testcomposethierry.ui.setup.RoutingScreen
 import com.example.testcomposethierry.ui.view_models.DetailScreenViewModel
 import com.example.testcomposethierry.ui.view_models.ListScreenViewModel
@@ -38,7 +38,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @Composable
 fun NavigationScreen(
     activity: ComponentActivity,
-    listArtPagingItems: LazyPagingItems<DataArtElement>,
+    usersListPagingItems: LazyPagingItems<DataUsersListElement>,
     listScreenViewModel: ListScreenViewModel = hiltViewModel(),
     detailScreenViewModel: DetailScreenViewModel = hiltViewModel(),
 ) {
@@ -54,46 +54,51 @@ fun NavigationScreen(
     }
     val items = listOf(
         RoutingScreen.MyListScreen,
-        RoutingScreen.MyDetailScreen,
+        // deactivated navigation to detail screen
+        //RoutingScreen.MyDetailScreen,
     )
     val activeRow by listScreenViewModel.activeRow.collectAsStateWithLifecycle()
     Scaffold(
         backgroundColor = MaterialTheme.colors.secondary,
         bottomBar = {
-            BottomNavigation {
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination
-                items.forEach { screen ->
-                    BottomNavigationItem(
-                        icon = {
-                            Icon(
-                                imageVector = when(screen) {
-                                    RoutingScreen.MyListScreen -> Icons.Filled.Favorite
-                                    RoutingScreen.MyDetailScreen -> Icons.Filled.AccountBox
-                                },
-                                contentDescription = null
-                            )
-                        },
-                        label = { Text(stringResource(screen.resourceId)) },
-                        selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
-                        // navigation from the bottom bar
-                        onClick = {
-                            navController.navigate(screen.route) {
-                                // Pop up to the start destination of the graph to
-                                // avoid building up a large stack of destinations
-                                // on the back stack as users select items
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-
-                                // Avoid multiple copies of the same destination when
-                                // reselecting the same item
-                                launchSingleTop = true
-                            }
-                        }
-                    )
-                }
-            }
+            // deactivated bottom bar
+//            BottomNavigation {
+//                val navBackStackEntry by navController.currentBackStackEntryAsState()
+//                val currentDestination = navBackStackEntry?.destination
+//                items.forEach { screen ->
+//                    BottomNavigationItem(
+//                        icon = {
+//                            Icon(
+//                                imageVector = when(screen) {
+//                                    RoutingScreen.MyListScreen -> Icons.Filled.Favorite
+//                                    // deactivated navigation to detail screen
+//                                    //RoutingScreen.MyDetailScreen -> Icons.Filled.AccountBox
+//                                    else -> Icons.Filled.Favorite
+//                                },
+//                                contentDescription = null
+//                            )
+//                        },
+//                        label = { Text(stringResource(screen.resourceId)) },
+//                        selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+//                        // navigation from the bottom bar
+//                        onClick = {
+//                            // deactivated navigation to detail screen
+////                            navController.navigate(screen.route) {
+////                                // Pop up to the start destination of the graph to
+////                                // avoid building up a large stack of destinations
+////                                // on the back stack as users select items
+////                                popUpTo(navController.graph.findStartDestination().id) {
+////                                    saveState = true
+////                                }
+////
+////                                // Avoid multiple copies of the same destination when
+////                                // reselecting the same item
+////                                launchSingleTop = true
+////                            }
+//                        }
+//                    )
+//                }
+//            }
         }
     ) { innerPadding ->
         NavHost(
@@ -104,32 +109,35 @@ fun NavigationScreen(
             composable(RoutingScreen.MyListScreen.route) {
                 ListScreen(
                     activeRow = activeRow,
-                    listArtPagingItems = listArtPagingItems,
+                    usersListPagingItems = usersListPagingItems,
                     navController = navController,
                 )
             }
-            // anomaly: as reported in this stack overflow, navigating, recomposes twice
-            // https://stackoverflow.com/questions/69190119/jetpack-compose-recompose-with-success-state-twice-when-exiting-current-composab?noredirect=1&lq=1
-            composable(RoutingScreen.MyDetailScreen.route) { backStackEntry ->
-                // this allows with the bottom back to go back and forth on previous active row
-                // and it starts at 0
-                val previousRow = if (activeRow != -1) activeRow else 0
-                val rowId = try {
-                    backStackEntry.arguments?.getString("rowId")?.toInt() ?: previousRow
-                } catch (_: Exception) {
-                    previousRow
-                }
-                DetailScreen(listArtPagingItems = listArtPagingItems, rowId = rowId, detailScreenViewModel = detailScreenViewModel)
-                // This LaunchedEffect is needed to mark in grey the active row in the main list
-                LaunchedEffect(Unit) {
-                    // we need a small delay so that we do not see the clicked row as active
-                    // with plain dark gray before having navigated to DetailScreen
-                    delay(300.milliseconds)
-                    if (rowId != activeRow) {
-                        listScreenViewModel.setActiveRow(owner = activity, rowId = rowId)
-                    }
-                }
-            }
+
+            // deactivated navigation to detail screen
+
+//            // anomaly: as reported in this stack overflow, navigating, recomposes twice
+//            // https://stackoverflow.com/questions/69190119/jetpack-compose-recompose-with-success-state-twice-when-exiting-current-composab?noredirect=1&lq=1
+//            composable(RoutingScreen.MyDetailScreen.route) { backStackEntry ->
+//                // this allows with the bottom back to go back and forth on previous active row
+//                // and it starts at 0
+//                val previousRow = if (activeRow != -1) activeRow else 0
+//                val rowId = try {
+//                    backStackEntry.arguments?.getString("rowId")?.toInt() ?: previousRow
+//                } catch (_: Exception) {
+//                    previousRow
+//                }
+//                DetailScreen(usersListPagingItems = usersListPagingItems, rowId = rowId, detailScreenViewModel = detailScreenViewModel)
+//                // This LaunchedEffect is needed to mark in grey the active row in the main list
+//                LaunchedEffect(Unit) {
+//                    // we need a small delay so that we do not see the clicked row as active
+//                    // with plain dark gray before having navigated to DetailScreen
+//                    delay(300.milliseconds)
+//                    if (rowId != activeRow) {
+//                        listScreenViewModel.setActiveRow(owner = activity, rowId = rowId)
+//                    }
+//                }
+//            }
         }
     }
 }

@@ -63,7 +63,7 @@ fun UiStateScreen(
         unexpectedServerDataErrorString = unexpectedServerDataErrorString,
     )
     val state by uiStateScreenViewModel.uiState.collectAsStateWithLifecycle()
-    val listArtPagingItems = uiStateScreenViewModel.listArt.collectAsLazyPagingItems()
+    val usersListPagingItems = uiStateScreenViewModel.usersList.collectAsLazyPagingItems()
     Box(contentAlignment = Alignment.TopCenter,
         modifier = Modifier
             .background(MaterialTheme.colors.secondary)
@@ -78,7 +78,7 @@ fun UiStateScreen(
                 is UiState.Empty -> ProgressIndicator()
                 UiState.Filled -> NavigationScreen(
                     activity = activity,
-                    listArtPagingItems = listArtPagingItems,
+                    usersListPagingItems = usersListPagingItems,
                 )
                 is UiState.Error -> ErrorScreen(state)
                 else -> Row {
@@ -86,7 +86,7 @@ fun UiStateScreen(
                 }
             }
             /*
-            LoadResult.Error will result in a changed stateListArt.loadState
+            LoadResult.Error will result in a changed stateusersList.loadState
             If the lazy loading has an error state, we update the UI State to an error
             Excerpt from androidx.paging / PagingSource.kt
          public sealed class LoadResult<Key : Any, Value : Any> {
@@ -101,8 +101,8 @@ fun UiStateScreen(
                  val throwable: Throwable
              ) : PagingSource.LoadResult<Key, Value>()
             */
-            LaunchedEffect(listArtPagingItems.loadState) {
-                listArtPagingItems.apply {
+            LaunchedEffect(usersListPagingItems.loadState) {
+                usersListPagingItems.apply {
                     if (loadState.refresh is LoadState.Error) {
                         uiStateScreenViewModel.setUiState(UiState.Error((loadState.refresh as LoadState.Error).error))
                         return@apply
@@ -118,9 +118,9 @@ fun UiStateScreen(
             // LazyPagingItems cannot be collected in the ViewModel, but it can be in a LaunchedEffect
             // https://developer.android.com/jetpack/compose/side-effects#snapshotFlow
             LaunchedEffect(Unit) {
-                snapshotFlow { listArtPagingItems.itemSnapshotList.count() }
+                snapshotFlow { usersListPagingItems.itemSnapshotList.count() }
                     .collect { listSize ->
-                        val loadState = listArtPagingItems.loadState
+                        val loadState = usersListPagingItems.loadState
                         if (loadState.refresh is LoadState.Error || loadState.append is LoadState.Error) {
                             return@collect
                         }

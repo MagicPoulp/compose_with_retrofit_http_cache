@@ -1,10 +1,8 @@
 package com.example.testcomposethierry.data.http
 
-import com.example.testcomposethierry.data.models.DataArtDetailFull
-import com.example.testcomposethierry.data.models.DataArtFull
+import com.example.testcomposethierry.data.models.DataUsersListFull
 import retrofit2.Response
 import retrofit2.http.GET
-import retrofit2.http.Path
 import retrofit2.http.Query
 
 // Retrofit interface
@@ -14,9 +12,6 @@ import retrofit2.http.Query
 // example of use:
 // https://randomuser.me/api/?inc=name,email&results=10&page=1&seed=merlin
 interface UsersApi {
-    @GET("/api/en/collection")
-    suspend fun getArtPaged(@Query("key") key: String, @Query("ps") pageSize: Int, @Query("p") pageOffset: Int): Response<DataArtFull>
-
-    @GET("/api/en/collection/{id}")
-    suspend fun getArtObjectDetail(@Path("id") id: String, @Query("key") key: String): Response<DataArtDetailFull>
+    @GET("/api/")
+    suspend fun getUsersListPaged(@Query("inc") inc: String, @Query("results") pageSize: Int, @Query("page") pageOffset: Int, @Query("seed") seed: String): Response<DataUsersListFull>
 }

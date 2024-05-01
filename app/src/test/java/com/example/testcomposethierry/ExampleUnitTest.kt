@@ -1,30 +1,16 @@
 package com.example.testcomposethierry
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.testing.TestLifecycleOwner
-import app.cash.turbine.test
-import com.example.testcomposethierry.data.models.DataArtDetail
-import com.example.testcomposethierry.data.repositories.ArtDataRepository
-import com.example.testcomposethierry.domain.detailscreen.GetDetailDataInParallelUseCase
 import com.example.testcomposethierry.ui.view_models.DetailScreenViewModel
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.mock
 
 
 /*
