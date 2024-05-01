@@ -81,7 +81,8 @@ fun TableItemRow(
         Row(
             horizontalArrangement = Arrangement.Start,
             modifier = Modifier.clickable {
-                navController.navigate(RoutingScreen.MyDetailScreen.route.replace("{rowId}", "$index"))
+                // deactivated navigation
+                // navController.navigate(RoutingScreen.MyDetailScreen.route.replace("{rowId}", "$index"))
             }
         ) {
             LeftAlignedText(text = item.email)
