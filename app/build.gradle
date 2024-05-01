@@ -19,7 +19,6 @@ android {
         targetSdk 33
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true
@@ -64,10 +63,17 @@ android {
         // Used for Unit testing Android dependent elements in /test folder
         unitTests.includeAndroidResources  = true
         unitTests.returnDefaultValues = true
+        unitTests.all {
+            jvmArgs(
+                    "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+                    "--add-opens", "java.base/java.lang.reflect=ALL-UNNAMED"
+            )
+        }
     }
 }
 
 dependencies {
+    implementation 'androidx.test:runner:1.5.2'
     def dagger_version = '2.47'
     def hilt_version = '1.0.0'
     def ktor_version = '2.3.2'
@@ -121,14 +127,16 @@ dependencies {
 
     // For DI with Hilt in the local unit tests
     // https://developer.android.com/training/dependency-injection/hilt-testing
-    testImplementation("com.google.dagger:hilt-android-testing:2.47")
-    kaptTest("com.google.dagger:hilt-compiler:2.47")
+    // from the documentation,
+    // dependencies can be passed manually without Hilt in unit tests
+    //testImplementation("com.google.dagger:hilt-android-testing:2.47")
+    //kaptTest("com.google.dagger:hilt-compiler:2.47")
 
     //test libs
     // Kotlin extensions for androidx.test.core
     // implementation("androidx.core:core-ktx:1.9.0")
     // Kotlin extensions for androidx.test.ext.junit
-    //implementation("androidx.test.ext:junit-ktx:1.1.4")
+    implementation("androidx.test.ext:junit-ktx:1.1.5")
 
     // mockito
     testImplementation("org.mockito.kotlin:mockito-kotlin:4.1.0")
@@ -173,9 +181,10 @@ dependencies {
     testImplementation "io.mockk:mockk-agent:1.13.1"
 
     // test an activity
-    testImplementation "androidx.test:core:1.5.0"
-    androidTestImplementation "androidx.test.core:app:1.5.0"
-    testImplementation "org.robolectric:robolectric:4.12.1"
+    // roboelectric
+    //testImplementation "androidx.test:core:1.5.0"
+    //androidTestImplementation "androidx.test.core:app:1.5.0"
+    //testImplementation "org.robolectric:robolectric:4.12.1"
 
     testImplementation 'androidx.arch.core:core-testing:2.2.0'
 }

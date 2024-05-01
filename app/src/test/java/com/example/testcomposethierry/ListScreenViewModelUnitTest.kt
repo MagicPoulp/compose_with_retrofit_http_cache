@@ -10,7 +10,6 @@ import androidx.lifecycle.testing.TestLifecycleOwner
 import com.example.testcomposethierry.data.http.NetworkConnectionManager
 import com.example.testcomposethierry.data.repositories.UsersListDataRepository
 import com.example.testcomposethierry.ui.view_models.ListScreenViewModel
-import dagger.hilt.android.testing.HiltAndroidTest
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
@@ -30,8 +29,6 @@ import org.junit.Rule
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.mock
-import org.robolectric.Robolectric
 
 
 /*
@@ -46,7 +43,6 @@ Dispatchers.setMain(UnconfinedTestDispatcher())
 testLifecycleOwner = TestLifecycleOwner()
  */
 
-@HiltAndroidTest
 class ListScreenViewModelUnitTest {
 
     //@get:Rule

@@ -7,7 +7,7 @@ import com.example.testcomposethierry.data.http.UsersApi
 import com.example.testcomposethierry.data.http.RetrofitHelper
 import com.example.testcomposethierry.data.models.DataUsersListElement
 import com.example.testcomposethierry.data.models.DataUsersListFull
-import com.example.testcomposethierry.domain.userslistdatarepository.FilterNonBLankUsersListDataUseCase
+import com.example.testcomposethierry.domain.userslistdatarepository.FilterNonBlankUsersListDataUseCase
 import kotlinx.coroutines.delay
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -15,7 +15,7 @@ import javax.inject.Singleton
 @Singleton
 class UsersListDataRepository @Inject constructor(
     private val retrofitHelper: RetrofitHelper,
-    private val filterNonBLankUsersListDataUseCase: FilterNonBLankUsersListDataUseCase,
+    private val filterNonBlankUsersListDataUseCase: FilterNonBlankUsersListDataUseCase,
     private val networkConnectionManager: NetworkConnectionManager,
 ) {
     private lateinit var api: UsersApi
@@ -49,7 +49,7 @@ class UsersListDataRepository @Inject constructor(
             val response = api.getUsersListPaged(inc, pageSize, pageOffset, AppConfig.seed)
             if (response.isSuccessful) {
                 response.body()?.let { dataUsersListFull: DataUsersListFull ->
-                    return ResultOf.Success(filterNonBLankUsersListDataUseCase(dataUsersListFull.results))
+                    return ResultOf.Success(filterNonBlankUsersListDataUseCase(dataUsersListFull.results))
                 }
             }
             return ResultOf.Failure(response.message(), null)
