@@ -7,10 +7,12 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.testing.TestLifecycleOwner
+import app.cash.turbine.test
 import com.example.testcomposethierry.data.http.NetworkConnectionManager
 import com.example.testcomposethierry.data.repositories.UsersListDataRepository
 import com.example.testcomposethierry.ui.view_models.ListScreenViewModel
 import io.mockk.every
+import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.spyk
@@ -65,7 +67,8 @@ class ListScreenViewModelUnitTest {
         // on { invoke(any()) } doReturn testingPokemonDetails
         //}
         //on { invoke(any()) } doReturn testingPokemonDetails
-        listScreenViewModel = spyk(ListScreenViewModel(usersListDataRepository, networkConnectionManager))
+        // TRICK: recordPrivateCalls = true
+        listScreenViewModel = spyk(ListScreenViewModel(usersListDataRepository, networkConnectionManager), recordPrivateCalls = true)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -82,26 +85,35 @@ class ListScreenViewModelUnitTest {
         val activity = mockk<ComponentActivity>()
         val testLifecycleOwner = TestLifecycleOwner()
         every { activity.lifecycle } returns testLifecycleOwner.lifecycle
-        every { listScreenViewModel.showInternetConnectivityErrorToast(activity, errorString) } returns Unit
-        listScreenViewModel.prepareInternetConnectivityErrorToaster(activity, errorString)
-        testLifecycleOwner.currentState = Lifecycle.State.STARTED
-        // delay to give time to the function prepareInternetConnectivityErrorToaster()
-        delay(2000L)
-        verify(exactly = 1) { listScreenViewModel.showInternetConnectivityErrorToast(any(), any()) }
+        justRun { listScreenViewModel invoke "showInternetConnectivityErrorToast" withArguments listOf(activity, errorString) }
+        networkConnectionManager.isConnected.test {
+            // TRICK  based on previous experiences, the collect in listScreenViewModel has consumed one awaitItem() for the initial value
+            listScreenViewModel.prepareInternetConnectivityErrorToaster(activity, errorString)
+            testLifecycleOwner.currentState = Lifecycle.State.STARTED
+            awaitItem()
+            ensureAllEventsConsumed()
+        }
+        // TRICK: test that a private method is called
+        verify(exactly = 1) { listScreenViewModel invoke "showInternetConnectivityErrorToast" withArguments listOf(activity, errorString)}
     }
 
     @Test
-    fun testNonNominalNoCollectIfLifeCycleStarted() = runTest {
+    fun testNonNominalNoCollectIfLifeCycleNotStarted() = runTest {
         val flowIsConnected = MutableStateFlow(false).asStateFlow()
         every { networkConnectionManager.isConnected } returns flowIsConnected
         val errorString = "error"
         val activity = mockk<ComponentActivity>()
         val testLifecycleOwner = TestLifecycleOwner()
         every { activity.lifecycle } returns testLifecycleOwner.lifecycle
-        every { listScreenViewModel.showInternetConnectivityErrorToast(any(), any()) } returns Unit
-        testLifecycleOwner.currentState = Lifecycle.State.INITIALIZED
-        listScreenViewModel.prepareInternetConnectivityErrorToaster(activity, errorString)
-        delay(2000L)
-        verify(exactly = 0) { listScreenViewModel.showInternetConnectivityErrorToast(any(), any()) }
+        justRun { listScreenViewModel invoke "showInternetConnectivityErrorToast" withArguments listOf(activity, errorString) }
+        // TRICK: turbine and awaitItem() are used
+        networkConnectionManager.isConnected.test {
+            testLifecycleOwner.currentState = Lifecycle.State.INITIALIZED
+            listScreenViewModel.prepareInternetConnectivityErrorToaster(activity, errorString)
+            awaitItem()
+            ensureAllEventsConsumed()
+        }
+        // TRICK: test that a private method is called
+        verify(exactly = 0) { listScreenViewModel invoke "showInternetConnectivityErrorToast" withArguments listOf(activity, errorString)}
     }
 }

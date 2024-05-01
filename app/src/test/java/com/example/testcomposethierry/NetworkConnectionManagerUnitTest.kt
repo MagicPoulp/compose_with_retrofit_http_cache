@@ -95,7 +95,8 @@ class NetworkConnectionManagerUnitTest {
         val activity = mockk<Activity>()
         val coroutineScope = CoroutineScope(Dispatchers.Default)
         every { activity.getSystemService(any()) } returns cm
-        networkConnectionManager = NetworkConnectionManagerImpl(activity, coroutineScope, true)
+        // TRICK: recordPrivateCalls = true
+        networkConnectionManager = spyk(NetworkConnectionManagerImpl(activity, coroutineScope, true), recordPrivateCalls = true)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -117,6 +118,7 @@ class NetworkConnectionManagerUnitTest {
 
     // DRY, we do not copy paste
     private fun testConnectivityManagerNetworkCallbackCommon(callbackToTest: CallbackToTest) = runTest {
+        // TRICK: mock a static function to return always tru
         val mockNetwork = mockk<Network>()
         mockkStatic(DoesNetworkHaveInternet::class)
         every { DoesNetworkHaveInternet.execute(mockNetwork.socketFactory) } returns true
@@ -125,12 +127,14 @@ class NetworkConnectionManagerUnitTest {
         every { mockCapabilities.hasCapability(any()) } returns true
         every { cm.getNetworkCapabilities(any()) } returns mockCapabilities
 
+        // TRICK: for the call on a private method
         // we use getDeclaredMethod to access a private method
         // the types of the method's arguments are needed in the second parameter
         val methodToTest: Method = networkConnectionManager.javaClass.getDeclaredMethod("createNetworkCallback")
         methodToTest.isAccessible = true
         @Suppress("UNCHECKED_CAST")
         val methodResult: ConnectivityManager.NetworkCallback = methodToTest.invoke(networkConnectionManager) as ConnectivityManager.NetworkCallback
+        // TRICK: use of turbine and await item to test the flow transitions
         // test extension from turbine
         networkConnectionManager.isConnected.test {
             // this is for the initial value
@@ -150,7 +154,9 @@ class NetworkConnectionManagerUnitTest {
                 assert(!networkConnectionManager.isConnected.value)
             }
         }
-        verify(exactly = 1) { networkConnectionManager.checkValidNetworks() }
+        // https://mockk.io/
+        // TRICK: test that a private method is called
+        verify { networkConnectionManager invoke "checkValidNetworks" withArguments emptyList()}
     }
 
     @Test

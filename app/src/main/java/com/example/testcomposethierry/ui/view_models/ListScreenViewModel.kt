@@ -54,7 +54,7 @@ class ListScreenViewModel @Inject constructor(
         }
     }
 
-    fun showInternetConnectivityErrorToast(activity: Activity, internetConnectivityErrorString: String) {
+    private fun showInternetConnectivityErrorToast(activity: Activity, internetConnectivityErrorString: String) {
         runBlocking {
             launch(Dispatchers.Main) {
                 Toast.makeText(activity, internetConnectivityErrorString, Toast.LENGTH_SHORT).show()
