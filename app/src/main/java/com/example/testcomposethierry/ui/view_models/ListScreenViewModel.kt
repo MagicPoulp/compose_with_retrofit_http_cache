@@ -67,4 +67,8 @@ class ListScreenViewModel @Inject constructor(
         }
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        networkConnectionManager.unregister()
+    }
 }

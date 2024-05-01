@@ -34,6 +34,7 @@ interface NetworkConnectionManager {
     val isConnected: StateFlow<Boolean>
     val isInitialized: Boolean
     fun checkAgainInternet()
+    fun unregister()
 }
 
 @Module
