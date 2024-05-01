@@ -1,5 +1,6 @@
 package com.example.testcomposethierry.ui.components.uistate
 
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -59,6 +60,7 @@ fun UiStateScreen(
     activity: ComponentActivity,
 ) {
     val unexpectedServerDataErrorString = activity.resources.getString(R.string.unexpected_server_data)
+    val internetConnectivityErrorString = activity.resources.getString(R.string.internet_connectivity_error)
     uiStateScreenViewModel.startPagerAndDataFetching(
         unexpectedServerDataErrorString = unexpectedServerDataErrorString,
     )
@@ -108,7 +110,9 @@ fun UiStateScreen(
                         return@apply
                     }
                     if (loadState.append is LoadState.Error) {
+                        // we removed the systematic error to allow transition between internet and cache mode
                         //uiStateScreenViewModel.setUiState(UiState.Error((loadState.append as LoadState.Error).error))
+                        Toast.makeText(activity, internetConnectivityErrorString, Toast.LENGTH_SHORT).show()
                         return@apply
                     }
                 }

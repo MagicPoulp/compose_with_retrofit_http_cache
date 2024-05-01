@@ -25,6 +25,7 @@ import javax.inject.Singleton
 import java.io.IOException
 import java.net.InetSocketAddress
 import javax.net.SocketFactory
+import javax.net.ssl.SSLSocketFactory
 
 // https://medium.com/@rawatsumit115/smart-way-to-observe-internet-connection-for-whole-app-in-android-kotlin-bd77361c76fb
 // https://medium.com/@veniamin.vynohradov/monitoring-internet-connection-state-in-android-da7ad915b5e5
@@ -32,6 +33,7 @@ import javax.net.SocketFactory
 interface NetworkConnectionManager {
     val isConnected: StateFlow<Boolean>
     val isInitialized: Boolean
+    fun checkAgainInternet()
 }
 
 @Module
@@ -56,17 +58,16 @@ object CoroutinesScopesModule {
 }
 
 object DoesNetworkHaveInternet {
-    private val TAG = this.javaClass.name
     // Make sure to execute this on a background thread.
     fun execute(socketFactory: SocketFactory): Boolean {
         return try{
             val socket = socketFactory.createSocket() ?: throw IOException("Socket is null.")
             socket.connect(InetSocketAddress("8.8.8.8", 53), 1500)
             socket.close()
-            //Log.d(TAG, "PING success.")
+            //Log.d(this.javaClass.name, "PING success.")
             true
         }catch (e: IOException){
-            //Log.e(TAG, "No internet connection.")
+            //Log.e(this.javaClass.name, "No internet connection.")
             false
         }
     }
@@ -105,6 +106,11 @@ class InternetConnectionObserver @Inject constructor(
 
             })
         }
+    }
+
+    override fun checkAgainInternet() {
+        val socket = SSLSocketFactory.getDefault()
+        _isConnected.tryEmit(DoesNetworkHaveInternet.execute(socket))
     }
 
     private fun createNetworkCallback() = object : ConnectivityManager.NetworkCallback()

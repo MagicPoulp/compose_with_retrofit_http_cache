@@ -37,6 +37,7 @@ class UsersListDataRepository @Inject constructor(
             // uncomment to test the error screen
             //if (pageOffset == 2)
             //    return ResultOf.Failure("TEST", null)
+            // needed delay so that internet connectivity can be detected before the first request
             var i = 0
             while (i < 10) {
                 if (!networkConnectionManager.isInitialized) {
