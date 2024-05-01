@@ -24,9 +24,11 @@ class HttpGetCacheManager @Inject constructor(
     // https://stackoverflow.com/questions/51141970/check-internet-connectivity-android-in-kotlin
     // https://shishirthedev.medium.com/retrofit-2-http-response-caching-e769a27af29f
     private fun isInternetAvailable(context: Context): Boolean {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            return networkConnectionManager.isNetworkConnected
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            return networkConnectionManager.isConnected.value
         } else {
+            // this stack overflow also checks the Build version (answer of WSBT)
+            // https://stackoverflow.com/questions/32547006/connectivitymanager-getnetworkinfoint-deprecated
             var isConnected = false
             val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo

@@ -1,44 +1,35 @@
 package com.example.testcomposethierry.data.http
 
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
-import android.os.Build
-import androidx.annotation.RequiresApi
-import androidx.core.content.getSystemService
-import dagger.Binds
-import dagger.Module
 import dagger.Provides
-import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
+import java.io.IOException
+import java.net.InetSocketAddress
+import javax.net.SocketFactory
 
+// https://medium.com/@rawatsumit115/smart-way-to-observe-internet-connection-for-whole-app-in-android-kotlin-bd77361c76fb
 // https://medium.com/@veniamin.vynohradov/monitoring-internet-connection-state-in-android-da7ad915b5e5
 
 interface NetworkConnectionManager {
-    /**
-     * Emits [Boolean] value when the current network becomes available or unavailable.
-     */
-    val isNetworkConnectedFlow: StateFlow<Boolean>
-
-    val isNetworkConnected: Boolean
-
-    fun startListenNetworkState()
-
-    fun stopListenNetworkState()
+    val isConnected: StateFlow<Boolean>
 }
 
 @Module
@@ -46,7 +37,7 @@ interface NetworkConnectionManager {
 abstract class NetworkConnectionManagerModule {
 
     @Binds
-    abstract fun bind(impl: NetworkConnectionManagerImpl): NetworkConnectionManager
+    abstract fun bind(impl: InternetConnectionObserver): NetworkConnectionManager
 }
 
 // https://medium.com/androiddevelopers/create-an-application-coroutinescope-using-hilt-dd444e721528
@@ -58,153 +49,117 @@ object CoroutinesScopesModule {
     @Provides
     fun providesCoroutineScope(): CoroutineScope {
         // Run this code when providing an instance of CoroutineScope
-        //return CoroutineScope(SupervisorJob() + Dispatchers.Default)
-        return CoroutineScope(Dispatchers.Default)
+        return CoroutineScope(SupervisorJob() + Dispatchers.Default)
     }
 }
 
+object DoesNetworkHaveInternet {
+    private val TAG = this.javaClass.name
+    // Make sure to execute this on a background thread.
+    fun execute(socketFactory: SocketFactory): Boolean {
+        return try{
+            val socket = socketFactory.createSocket() ?: throw IOException("Socket is null.")
+            socket.connect(InetSocketAddress("8.8.8.8", 53), 1500)
+            socket.close()
+            //Log.d(TAG, "PING success.")
+            true
+        }catch (e: IOException){
+            //Log.e(TAG, "No internet connection.")
+            false
+        }
+    }
+}
+
+interface InternetConnectionCallback {
+    fun onConnected()
+    fun onDisconnected()
+}
+
 @Singleton
-class NetworkConnectionManagerImpl @Inject constructor(
+class InternetConnectionObserver @Inject constructor(
     @ApplicationContext context: Context,
-    coroutineScope: CoroutineScope
+    private val coroutineScope: CoroutineScope
 ) : NetworkConnectionManager {
-
-    private val connectivityManager: ConnectivityManager = context.getSystemService()!!
-
-    private val networkCallback = NetworkCallback()
-
-    private val _currentNetwork = MutableStateFlow(provideDefaultCurrentNetwork())
-
-    override val isNetworkConnectedFlow: StateFlow<Boolean> =
-        _currentNetwork
-            .map { it.isConnected() }
-            .stateIn(
-                scope = coroutineScope,
-                started = SharingStarted.Eagerly,
-                initialValue = _currentNetwork.value.isConnected()
-            )
-
-    override val isNetworkConnected: Boolean
-        get() = isNetworkConnectedFlow.value
+    private lateinit var networkCallback: ConnectivityManager.NetworkCallback
+    private var cm: ConnectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    private val validNetworks: MutableSet<Network> = HashSet()
+    private var connectionCallback: InternetConnectionCallback? = null
+    private val _isConnected = MutableStateFlow(false)
+    override val isConnected: StateFlow<Boolean>
+        get() = _isConnected.asStateFlow()
 
     init {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            startListenNetworkState()
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            register()
+            setCallback(object : InternetConnectionCallback {
+                override fun onConnected() {
+                    _isConnected.tryEmit(true)
+                }
+
+                override fun onDisconnected() {
+                    _isConnected.tryEmit(false)
+                }
+
+            })
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
-    override fun startListenNetworkState() {
-        if (_currentNetwork.value.isListening) {
-            return
+    private fun createNetworkCallback() = object : ConnectivityManager.NetworkCallback()
+    {
+        /*
+          Called when a network is detected. If that network has internet, save it in the Set.
+          Source: https://developer.android.com/reference/android/net/ConnectivityManager.NetworkCallback#onAvailable(android.net.Network)
+         */
+        override fun onAvailable(network: Network) {
+            val networkCapabilities = cm.getNetworkCapabilities(network)
+            val hasInternetCapability = networkCapabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            if (hasInternetCapability == true) {
+                // check if this network actually has internet
+                coroutineScope.launch {
+                    val hasInternet = DoesNetworkHaveInternet.execute(network.socketFactory)
+                    if(hasInternet){
+                        withContext(Dispatchers.Main){
+                            validNetworks.add(network)
+                            checkValidNetworks()
+                        }
+                    }
+                }
+            }
         }
 
-        // Reset state before start listening
-        _currentNetwork.update {
-            provideDefaultCurrentNetwork()
-                .copy(isListening = true)
+        /*
+          If the callback was registered with registerNetworkCallback() it will be called for each network which no longer satisfies the criteria of the callback.
+          Source: https://developer.android.com/reference/android/net/ConnectivityManager.NetworkCallback#onLost(android.net.Network)
+         */
+        override fun onLost(network: Network) {
+            validNetworks.remove(network)
+            checkValidNetworks()
         }
 
+    }
+
+    private fun checkValidNetworks() {
+        val status = validNetworks.size > 0
+        if(status){
+            connectionCallback?.onConnected()
+        } else{
+            connectionCallback?.onDisconnected()
+        }
+    }
+
+    private fun register() {
+        networkCallback = createNetworkCallback()
         val networkRequest = NetworkRequest.Builder()
             .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-            // https://stackoverflow.com/questions/66785742/check-internet-connection-status-through-wifi-connection-to-raise-a-notification
-            .addCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
             .build()
-        connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
-        //connectivityManager.registerDefaultNetworkCallback(networkCallback)
+        cm.registerNetworkCallback(networkRequest, networkCallback)
     }
 
-    override fun stopListenNetworkState() {
-        if (!_currentNetwork.value.isListening) {
-            return
-        }
-
-        _currentNetwork.update {
-            it.copy(isListening = false)
-        }
-
-        connectivityManager.unregisterNetworkCallback(networkCallback)
+    fun unRegister(){
+        cm.unregisterNetworkCallback(networkCallback)
     }
 
-    private inner class NetworkCallback : ConnectivityManager.NetworkCallback() {
-        override fun onAvailable(network: Network) {
-            _currentNetwork.update {
-                it.copy(isAvailable = true)
-            }
-        }
-
-        override fun onLost(network: Network) {
-            _currentNetwork.update {
-                it.copy(
-                    isAvailable = false,
-                    networkCapabilities = null
-                )
-            }
-        }
-
-        override fun onUnavailable() {
-            _currentNetwork.update {
-                it.copy(
-                    isAvailable = false,
-                    networkCapabilities = null
-                )
-            }
-        }
-
-        override fun onCapabilitiesChanged(
-            network: Network,
-            networkCapabilities: NetworkCapabilities
-        ) {
-            _currentNetwork.update {
-                it.copy(networkCapabilities = networkCapabilities)
-            }
-        }
-
-        override fun onBlockedStatusChanged(network: Network, blocked: Boolean) {
-            _currentNetwork.update {
-                it.copy(isBlocked = blocked)
-            }
-        }
-    }
-
-    /**
-     * On Android 9, [ConnectivityManager.NetworkCallback.onBlockedStatusChanged] is not called when
-     * we call the [ConnectivityManager.registerDefaultNetworkCallback] function.
-     * Hence we assume that the network is unblocked by default.
-     */
-    private fun provideDefaultCurrentNetwork(): CurrentNetwork {
-        return CurrentNetwork(
-            isListening = false,
-            networkCapabilities = null,
-            isAvailable = false,
-            isBlocked = false
-        )
-    }
-
-    private data class CurrentNetwork(
-        val isListening: Boolean,
-        val networkCapabilities: NetworkCapabilities?,
-        val isAvailable: Boolean,
-        val isBlocked: Boolean
-    )
-
-    private fun CurrentNetwork.isConnected(): Boolean {
-        // Since we don't know the network state if NetworkCallback is not registered.
-        // We assume that it's disconnected.
-        return isListening &&
-                isAvailable &&
-                !isBlocked &&
-                networkCapabilities.isNetworkCapabilitiesValid()
-    }
-
-    private fun NetworkCapabilities?.isNetworkCapabilitiesValid(): Boolean = when {
-        this == null -> false
-        hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
-                hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) &&
-                (hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
-                        hasTransport(NetworkCapabilities.TRANSPORT_VPN) ||
-                        hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
-                        hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) -> true
-        else -> false
+    private fun setCallback(connectionCallback: InternetConnectionCallback) {
+        this.connectionCallback = connectionCallback
     }
 }
