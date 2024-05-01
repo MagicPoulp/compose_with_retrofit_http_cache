@@ -1,6 +1,7 @@
 package com.example.testcomposethierry.data.http
 
 
+import com.example.testcomposethierry.data.config.AppConfig
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import okhttp3.Dispatcher
 import okhttp3.Interceptor
@@ -19,10 +20,11 @@ import javax.inject.Inject
 // add a header:
 // https://stackoverflow.com/questions/32605711/adding-header-to-all-request-with-retrofit-2
 class RetrofitHelper @Inject constructor(
+    private val httpGetCacheManager: HttpGetCacheManager
 ) {
+
     // we can specify the base url, the max number of concurrent connections, and an extra API key header
     fun getInstance(baseUrl: String, okHttpClient: OkHttpClient?, requestHeaders: List<Pair<String, String>>?): Retrofit {
-
         val dispatcher = Dispatcher()
         //dispatcher.maxRequests = maxConnections
 
@@ -64,6 +66,13 @@ class RetrofitHelper @Inject constructor(
             }
             response
         })
+
+        // https://shishirthedev.medium.com/retrofit-2-http-response-caching-e769a27af29f
+        if (AppConfig.httpGetCacheActive) {
+            builder.addInterceptor(httpGetCacheManager.offlineInterceptor)
+            builder.addNetworkInterceptor(httpGetCacheManager.onlineInterceptor)
+            builder.cache(httpGetCacheManager.cache)
+        }
 
         requestHeaders?.let {
             builder.addInterceptor { chain: Interceptor.Chain ->

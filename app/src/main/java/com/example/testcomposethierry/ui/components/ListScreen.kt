@@ -24,7 +24,6 @@ import androidx.navigation.NavController
 import androidx.paging.compose.LazyPagingItems
 import com.example.testcomposethierry.data.models.DataUsersListElement
 import com.example.testcomposethierry.ui.reusable_components.LeftAlignedText
-import com.example.testcomposethierry.ui.setup.RoutingScreen
 
 val horizontalMargin = 20.dp
 val rowHeight = 60.dp
