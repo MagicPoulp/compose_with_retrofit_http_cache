@@ -2,24 +2,18 @@
 
 Thierry Vilmart
 
-December 2023
+April 2024
 
 # Summary
 
-A modern Android project using a Realm cache in an HTTP interceptor, using prefetching in parallel flows,
-and with a unit test of the parallel flow with turbine.
+A modern Android project using a cache of GET requests via retrofit, somewhat like browsers do.
 
-Interesting in this project:
-- A unit test of a flatMergeMap parallel flow using turbine
-- Compose with paging3 is used to page the lazy loading of a LazyColomn.
-- Realm is used in an HTTP interceptor to support an offline mode.
-- We fetch data and present it in a list and we can tap to open the detail page.
-- 2 API points are used, one for the list, and one for the detail.
-The detail data is prefetched without delaying the display of the list
-- Error handling is managed with a specific screen
-- The result pattern design pattern is used.
-- StateFlow is used to update the UI with observeAsState() in the compose component
-(similar to LiveData but without observing on the UI thread)
-- the clean architecture is used with used cases, and repositories
-- Dependency injection is used with Hilt, in the app, and in the test
-- Additional filtering of duplicates was added in the Pager because the API was sending duplicates.
+# Assimgnet's questions
+
+- give us your context at the time you did this skills test. Were you stressed/relaxed, under some constraints?
+- present your work; explain its architecture, main components and how they interact with each other. Feel free to include diagrams as appropriate. Hand-drawn is fine.
+- explain where you applied some developers' good practices: design pattern, SOLID, KISS, DRY principles, etc...
+- explain your development strategy:
+    - if you favored some functionalities or layers
+    - your commits strategy
+- explain if your code is future-proof (scalable, robust to changes, etc...)

@@ -34,7 +34,8 @@ class FilterPagingDataUseCase @Inject constructor(
             itemIndex += 1
             elem.objectNumber?.let {
                 // We send to the Channel the IDs that need to be prefetched for getting the detail data
-                channelIndexesToPrefetch.send(Pair(itemIndex, elem.objectNumber))
+                // REMOVED, no need of filtering
+                //channelIndexesToPrefetch.send(Pair(itemIndex, elem.objectNumber))
             }
             elem
         }

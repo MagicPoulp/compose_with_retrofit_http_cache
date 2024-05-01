@@ -57,15 +57,16 @@ class RetrofitHelper @Inject constructor(
             {
                 print(t.message)
                 if (t.message?.contains("Unable to resolve host") == true) { // no internet
-                    return@Interceptor persistentHttpDataManager.loadResponse(request.url.toString(), request, null)
+                    //return@Interceptor persistentHttpDataManager.loadResponse(request.url.toString(), request, null)
                 }
                 throw t
             })
             if (response.isSuccessful) {
-                persistentHttpDataManager.saveResponse(request.url.toString(), response)
+                // REMOVED use GET cache instead
+                //persistentHttpDataManager.saveResponse(request.url.toString(), response)
             }
             if (response.code == 503) {
-                persistentHttpDataManager.loadResponse(request.url.toString(), request, response)
+                //persistentHttpDataManager.loadResponse(request.url.toString(), request, response)
             }
             response
             // how to test: to develop without using the server, use this
