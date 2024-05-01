@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.paging.compose.LazyPagingItems
-import com.example.testcomposethierry.data.models.DataArtElement
+import com.example.testcomposethierry.data.models.DataUsersListElement
 import com.example.testcomposethierry.ui.reusable_components.LeftAlignedText
 import com.example.testcomposethierry.ui.setup.RoutingScreen
 
@@ -33,7 +33,7 @@ val rowHeight = 60.dp
 @Composable
 fun ListScreen(
     activeRow: Int,
-    listArtPagingItems: LazyPagingItems<DataArtElement>,
+    usersListPagingItems: LazyPagingItems<DataUsersListElement>,
     navController: NavController,
 ) {
     // keep the scrolling state upon screen rotation
@@ -49,16 +49,16 @@ fun ListScreen(
                 .background(MaterialTheme.colors.secondary),
             contentPadding = PaddingValues(horizontal = horizontalMargin),
         ) {
-            // as stated at the link below, items(stateListArt.itemSnapshotList) does not work with AppConfig.pagingSize = 10, and total items = 48
+            // as stated at the link below, items(stateusersList.itemSnapshotList) does not work with AppConfig.pagingSize = 10, and total items = 48
             // but it works using the itemsIndex alternative
             // https://stackoverflow.com/questions/75960184/why-jetpack-compose-room-offline-pagination-not-loading-next-page
-            //items(stateListArt.itemSnapshotList) {item ->
+            //items(stateusersList.itemSnapshotList) {item ->
             //item?.let {
             //    TableItemRow(item)
             //}
             //}
-            itemsIndexed(listArtPagingItems.itemSnapshotList) { index, _ ->
-                listArtPagingItems[index]?.let { TableItemRow(activeRow = activeRow, item = it, index = index, navController = navController) }
+            itemsIndexed(usersListPagingItems.itemSnapshotList) { index, _ ->
+                usersListPagingItems[index]?.let { TableItemRow(activeRow = activeRow, item = it, index = index, navController = navController) }
             }
         }
     }
@@ -67,7 +67,7 @@ fun ListScreen(
 @Composable
 fun TableItemRow(
     activeRow: Int,
-    item: DataArtElement,
+    item: DataUsersListElement,
     index: Int,
     navController: NavController,
 ) {
@@ -84,7 +84,7 @@ fun TableItemRow(
                 navController.navigate(RoutingScreen.MyDetailScreen.route.replace("{rowId}", "$index"))
             }
         ) {
-            item.title?.let { LeftAlignedText(text = it) }
+            item.email.isNotBlank().let { LeftAlignedText(text = item.email) }
         }
         Divider(
             color = Color.White,

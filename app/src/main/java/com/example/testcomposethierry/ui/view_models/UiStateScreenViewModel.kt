@@ -8,9 +8,9 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.testcomposethierry.BuildConfig
 import com.example.testcomposethierry.data.config.AppConfig
-import com.example.testcomposethierry.data.models.DataArtElement
 import com.example.testcomposethierry.data.UsersDataPagingSource
-import com.example.testcomposethierry.data.repositories.ArtDataRepository
+import com.example.testcomposethierry.data.models.DataUsersListElement
+import com.example.testcomposethierry.data.repositories.UsersListDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UiStateScreenViewModel @Inject constructor(
-    private val artDataRepository: ArtDataRepository,
+    private val usersListDataRepository: UsersListDataRepository,
 ) : ViewModel()
 {
     // UI state variables
@@ -29,7 +29,7 @@ class UiStateScreenViewModel @Inject constructor(
     val uiState: StateFlow<UiState>
         get() = _uiState.asStateFlow()
 
-    lateinit var listArt: Flow<PagingData<DataArtElement>>
+    lateinit var usersList: Flow<PagingData<DataUsersListElement>>
     private var isPagerinitialized = false
 
     // ------------------------------------------
@@ -60,8 +60,8 @@ class UiStateScreenViewModel @Inject constructor(
         // https://developer.android.com/topic/libraries/architecture/paging/v3-network-db
         // or one can use the caching of HTTP requests themselves as we did in this project
         // (see PersistentDataManager)
-        listArt = Pager(PagingConfig(pageSize = AppConfig.pagingSize)) {
-            UsersDataPagingSource(unexpectedServerDataErrorString, artDataRepository)
+        usersList = Pager(PagingConfig(pageSize = AppConfig.pagingSize)) {
+            UsersDataPagingSource(unexpectedServerDataErrorString, usersListDataRepository)
         }
             .flow
             // The cachedIn() operator makes the data stream shareable and caches the loaded data with the provided CoroutineScope. In any configuration change, it will provide the existing data instead of getting the data from scratch. It will also prevent memory leak.
