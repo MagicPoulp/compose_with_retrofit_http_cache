@@ -49,7 +49,7 @@ I did not use a library for caching (https://github.com/ncornette/OkCacheControl
 
     - your commits strategy
 
-There are commits of 2 kings, doc commits and big fundamental steps.
+There are commits of 2 kinds, doc commits and big fundamental steps.
 However, I am used to follow standard prefixes, such as build, bump, ci, deps(add|change|remove), docs, enabler, feat(add|change|remove), fixbug, refactor, test.
 
 - explain if your code is future-proof (scalable, robust to changes, etc...)
@@ -57,3 +57,4 @@ However, I am used to follow standard prefixes, such as build, bump, ci, deps(ad
 Following the clean architecture makes the project robust to change.
 The setup is in place (see NavigationScreen) to navigate across multiple pages
 
+Flaws: transitions from offline to online are not always smooth. No recovery from the Error page, even if we have Toasters in many cases.
