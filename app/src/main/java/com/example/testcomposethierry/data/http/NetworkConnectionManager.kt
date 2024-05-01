@@ -14,6 +14,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,6 +31,7 @@ import javax.net.SocketFactory
 
 interface NetworkConnectionManager {
     val isConnected: StateFlow<Boolean>
+    val isInitialized: Boolean
 }
 
 @Module
@@ -87,6 +89,7 @@ class InternetConnectionObserver @Inject constructor(
     private val _isConnected = MutableStateFlow(false)
     override val isConnected: StateFlow<Boolean>
         get() = _isConnected.asStateFlow()
+    override var isInitialized = false
 
     init {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
@@ -117,10 +120,11 @@ class InternetConnectionObserver @Inject constructor(
                 // check if this network actually has internet
                 coroutineScope.launch {
                     val hasInternet = DoesNetworkHaveInternet.execute(network.socketFactory)
-                    if(hasInternet){
-                        withContext(Dispatchers.Main){
+                    if (hasInternet){
+                        withContext(Dispatchers.IO) {
                             validNetworks.add(network)
                             checkValidNetworks()
+                            isInitialized = true
                         }
                     }
                 }
@@ -132,6 +136,7 @@ class InternetConnectionObserver @Inject constructor(
           Source: https://developer.android.com/reference/android/net/ConnectivityManager.NetworkCallback#onLost(android.net.Network)
          */
         override fun onLost(network: Network) {
+            isInitialized = true
             validNetworks.remove(network)
             checkValidNetworks()
         }
