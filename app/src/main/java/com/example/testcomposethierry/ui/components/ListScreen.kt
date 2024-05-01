@@ -84,7 +84,7 @@ fun TableItemRow(
                 navController.navigate(RoutingScreen.MyDetailScreen.route.replace("{rowId}", "$index"))
             }
         ) {
-            item.email.isNotBlank().let { LeftAlignedText(text = item.email) }
+            LeftAlignedText(text = item.email)
         }
         Divider(
             color = Color.White,
