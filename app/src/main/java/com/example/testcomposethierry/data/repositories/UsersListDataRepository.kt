@@ -6,12 +6,14 @@ import com.example.testcomposethierry.data.http.UsersApi
 import com.example.testcomposethierry.data.http.RetrofitHelper
 import com.example.testcomposethierry.data.models.DataUsersListElement
 import com.example.testcomposethierry.data.models.DataUsersListFull
+import com.example.testcomposethierry.domain.userslistdatarepository.FilterNonBLankUsersListDataUseCase
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class UsersListDataRepository @Inject constructor(
     private val retrofitHelper: RetrofitHelper,
+    private val filterNonBLankUsersListDataUseCase: FilterNonBLankUsersListDataUseCase,
 ) {
     private lateinit var api: UsersApi
 
@@ -36,7 +38,7 @@ class UsersListDataRepository @Inject constructor(
             val response = api.getUsersListPaged(inc, pageSize, pageOffset, AppConfig.seed)
             if (response.isSuccessful) {
                 response.body()?.let { dataUsersListFull: DataUsersListFull ->
-                    return ResultOf.Success(dataUsersListFull.results)
+                    return ResultOf.Success(filterNonBLankUsersListDataUseCase(dataUsersListFull.results))
                 }
             }
             return ResultOf.Failure(response.message(), null)
