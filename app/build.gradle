@@ -59,6 +59,12 @@ android {
     packagingOptions {
         exclude 'META-INF/*'
     }
+
+    testOptions {
+        // Used for Unit testing Android dependent elements in /test folder
+        unitTests.includeAndroidResources  = true
+        unitTests.returnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -163,8 +169,15 @@ dependencies {
 
 
     // mockk has every ... getProperty to test private members
-    //testImplementation "io.mockk:mockk-android:1.13.1"
-    //testImplementation "io.mockk:mockk-agent:1.13.1"
+    testImplementation "io.mockk:mockk-android:1.13.1"
+    testImplementation "io.mockk:mockk-agent:1.13.1"
+
+    // test an activity
+    testImplementation "androidx.test:core:1.5.0"
+    androidTestImplementation "androidx.test.core:app:1.5.0"
+    testImplementation "org.robolectric:robolectric:4.12.1"
+
+    testImplementation 'androidx.arch.core:core-testing:2.2.0'
 }
 
 tasks.withType(Test).configureEach {

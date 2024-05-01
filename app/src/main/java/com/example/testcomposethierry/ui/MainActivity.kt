@@ -14,31 +14,14 @@ import com.example.testcomposethierry.ui.theme.TestComposeThierryTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject
-    lateinit var networkConnectionManager: NetworkConnectionManager
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val self = this
-        lifecycleScope.launch(Dispatchers.IO) {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                networkConnectionManager.isConnected
-                    // a cold flow is not executed without a collector
-                    .collect { isConnected ->
-                        if (!isConnected) {
-                            launch(Dispatchers.Main) {
-                                Toast.makeText(self, resources.getString(R.string.internet_connectivity_error), Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    }
-            }
-        }
 
         setContent {
             TestComposeThierryTheme {
