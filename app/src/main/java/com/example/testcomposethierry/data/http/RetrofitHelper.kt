@@ -13,14 +13,14 @@ import retrofit2.converter.jackson.JacksonConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-
 // https://www.geeksforgeeks.org/retrofit-with-kotlin-coroutine-in-android/
 // https://github.com/AsyncHttpClient/async-http-client/tree/master/extras/retrofit2
 // https://stackoverflow.com/questions/52881862/throttle-or-limit-kotlin-coroutine-count
 // add a header:
 // https://stackoverflow.com/questions/32605711/adding-header-to-all-request-with-retrofit-2
 class RetrofitHelper @Inject constructor(
-    private val httpGetCacheManager: HttpGetCacheManager
+    private val httpGetCacheManager: HttpGetCacheManager,
+    private val networkConnectionManager: NetworkConnectionManager,
 ) {
 
     // we can specify the base url, the max number of concurrent connections, and an extra API key header
@@ -36,12 +36,12 @@ class RetrofitHelper @Inject constructor(
         builder.readTimeout(8, TimeUnit.SECONDS)
         builder.connectTimeout(8, TimeUnit.SECONDS)
 
-        /*
-        if (BuildConfig.DEBUG) {
-            val interceptor = HttpLoggingInterceptor()
-            interceptor.level = HttpLoggingInterceptor.Level.BASIC
-            builder.addInterceptor(interceptor)
-        }*/
+        // to log requests
+        //if (BuildConfig.DEBUG) {
+        //    val interceptor = HttpLoggingInterceptor()
+        //    interceptor.level = HttpLoggingInterceptor.Level.BASIC
+        //    builder.addInterceptor(interceptor)
+        //}
 
         // https://stackoverflow.com/questions/44046695/get-response-class-type-in-retrofit2-interceptor-caching-for-realm
         builder.addInterceptor(Interceptor { chain ->
@@ -52,24 +52,22 @@ class RetrofitHelper @Inject constructor(
             catch (t: Throwable)
             {
                 print(t.message)
-                if (t.message?.contains("Unable to resolve host") == true) { // no internet
-                    //return@Interceptor persistentHttpDataManager.loadResponse(request.url.toString(), request, null)
+                // errors below could be because of no internet connectivity
+                // we need to update the internet status so that next requests can use the cache
+                if (t.message?.contains("Unable to resolve host") == true) {
+                    networkConnectionManager.checkAgainInternet()
+                }
+                if (t.message?.contains("Unable to resolve host") == true) {
+                    networkConnectionManager.checkAgainInternet()
                 }
                 throw t
             })
-            if (response.isSuccessful) {
-                // REMOVED use GET cache instead
-                //persistentHttpDataManager.saveResponse(request.url.toString(), response)
-            }
-            if (response.code == 503) {
-                //persistentHttpDataManager.loadResponse(request.url.toString(), request, response)
-            }
             response
         })
 
         // https://shishirthedev.medium.com/retrofit-2-http-response-caching-e769a27af29f
         if (AppConfig.httpGetCacheActive) {
-            builder.addInterceptor(httpGetCacheManager.offlineInterceptor)
+           // builder.addInterceptor(httpGetCacheManager.offlineInterceptor)
             builder.addNetworkInterceptor(httpGetCacheManager.onlineInterceptor)
             builder.cache(httpGetCacheManager.cache)
         }

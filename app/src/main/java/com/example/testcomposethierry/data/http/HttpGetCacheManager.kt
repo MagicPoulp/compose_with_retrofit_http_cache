@@ -2,7 +2,6 @@ package com.example.testcomposethierry.data.http
 
 import android.content.Context
 import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.net.NetworkInfo
 import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.Cache
