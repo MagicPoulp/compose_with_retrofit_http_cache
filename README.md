@@ -58,3 +58,6 @@ Following the clean architecture makes the project robust to change.
 The setup is in place (see NavigationScreen) to navigate across multiple pages
 
 Flaws: transitions from offline to online are not always smooth. No recovery from the Error page, even if we have Toasters in many cases.
+
+Important: a more clever cache could be made using retris on GET requests, and switching from and to the cache mode.
+Moreover, cached data would benefit from being refreshed to get the latest changes.
