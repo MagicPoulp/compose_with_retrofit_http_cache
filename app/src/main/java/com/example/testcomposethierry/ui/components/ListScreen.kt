@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +16,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,7 +28,7 @@ import com.example.testcomposethierry.data.models.DataUsersListElement
 import com.example.testcomposethierry.ui.reusable_components.LeftAlignedText
 
 val horizontalMargin = 20.dp
-val rowHeight = 60.dp
+val rowHeight = 100.dp
 //const val goldenNumber = 1.618
 
 @Composable
@@ -77,14 +79,17 @@ fun TableItemRow(
             .background(color = if (isPreviousActiveRow) MaterialTheme.colors.primary else MaterialTheme.colors.secondary)
             .height(rowHeight),
         contentAlignment = Alignment.Center) {
-        Row(
-            horizontalArrangement = Arrangement.Start,
-            modifier = Modifier.clickable {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            //modifier = Modifier.clickable {
                 // deactivated navigation
                 // navController.navigate(RoutingScreen.MyDetailScreen.route.replace("{rowId}", "$index"))
-            }
+            //}
         ) {
-            LeftAlignedText(text = item.email)
+            Text(text = item.name.first + " " + item.name.last)
+            Text(text = item.email)
         }
         Divider(
             color = Color.White,
