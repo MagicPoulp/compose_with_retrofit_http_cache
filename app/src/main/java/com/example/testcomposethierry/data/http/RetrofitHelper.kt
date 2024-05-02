@@ -67,7 +67,7 @@ class RetrofitHelper @Inject constructor(
 
         // https://shishirthedev.medium.com/retrofit-2-http-response-caching-e769a27af29f
         if (AppConfig.httpGetCacheActive) {
-           // builder.addInterceptor(httpGetCacheManager.offlineInterceptor)
+            builder.addInterceptor(httpGetCacheManager.offlineInterceptor)
             builder.addNetworkInterceptor(httpGetCacheManager.onlineInterceptor)
             builder.cache(httpGetCacheManager.cache)
         }
