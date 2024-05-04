@@ -1,7 +1,6 @@
 package com.example.testcomposethierry.ui.view_models
 
 import androidx.lifecycle.ViewModel
-import androidx.paging.compose.LazyPagingItems
 import com.example.testcomposethierry.data.models.DataUsersListElement
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

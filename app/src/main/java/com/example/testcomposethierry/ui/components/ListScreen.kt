@@ -1,12 +1,10 @@
 package com.example.testcomposethierry.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.paging.compose.LazyPagingItems
 import com.example.testcomposethierry.data.models.DataUsersListElement
-import com.example.testcomposethierry.ui.reusable_components.LeftAlignedText
 
 val horizontalMargin = 20.dp
 val rowHeight = 100.dp

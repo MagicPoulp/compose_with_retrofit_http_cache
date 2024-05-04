@@ -1,9 +1,7 @@
 package com.example.testcomposethierry.data.data_sources
 
-import com.example.testcomposethierry.data.custom_structures.ResultOf
 import com.example.testcomposethierry.data.http.NetworkConnectionManager
 import com.example.testcomposethierry.data.http.RetrofitHelperWithGetHttpCache
-import com.example.testcomposethierry.data.models.DataUsersListElement
 import com.example.testcomposethierry.domain.userslistdatarepository.FilterNonBlankUsersListDataUseCase
 import kotlinx.coroutines.delay
 import javax.inject.Inject

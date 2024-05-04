@@ -6,11 +6,8 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import com.example.testcomposethierry.data.models.DataUsersListElement
-import com.example.testcomposethierry.ui.components.uistate.ErrorScreen
 import com.example.testcomposethierry.ui.components.uistate.ProgressIndicator
-import com.example.testcomposethierry.ui.reusable_components.CenterAlignedText
 import com.example.testcomposethierry.ui.view_models.DetailScreenViewModel
-import com.example.testcomposethierry.ui.view_models.UiState
 
 @Composable
 fun DetailScreen(

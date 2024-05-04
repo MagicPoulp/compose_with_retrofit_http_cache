@@ -7,8 +7,8 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.testcomposethierry.BuildConfig
-import com.example.testcomposethierry.data.config.AppConfig
 import com.example.testcomposethierry.data.UsersDataPagingSource
+import com.example.testcomposethierry.data.config.AppConfig
 import com.example.testcomposethierry.data.models.DataUsersListElement
 import com.example.testcomposethierry.data.repositories.UsersListDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel

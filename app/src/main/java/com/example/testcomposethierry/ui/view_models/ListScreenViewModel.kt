@@ -1,25 +1,15 @@
 package com.example.testcomposethierry.ui.view_models
 
 
-import android.app.Activity
-import android.widget.Toast
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import com.example.testcomposethierry.R
-import com.example.testcomposethierry.data.http.NetworkConnectionManager
 import com.example.testcomposethierry.data.repositories.UsersListDataRepository
-import com.example.testcomposethierry.ui.MainActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 sealed class UiState {
