@@ -119,8 +119,11 @@ dependencies {
     //testImplementation "io.insert-koin:koin-test:$koin_version"
 
     // realm
+    // https://www.mongodb.com/docs/atlas/device-sdks/sdk/kotlin/install/
     implementation 'io.realm.kotlin:library-base:1.11.0'
-    implementation 'io.realm.kotlin:library-sync:1.11.0'
+    // to sync the database with Atlas
+    //implementation 'io.realm.kotlin:library-sync:1.11.0'
+    //implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0' // If using coroutines with the SDK
 
     // -------------------------------------------------------------
     // testing

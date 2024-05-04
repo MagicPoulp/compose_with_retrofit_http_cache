@@ -106,7 +106,7 @@ class HttpGetCacheManager @Inject constructor(
     var onlineInterceptor: Interceptor = Interceptor { chain ->
         val request: Request = chain.request()
         val response = chain.proceed(request)
-        if (request.method != "GET") {
+        if (request.method() != "GET") {
              return@Interceptor response
         }
         val maxAge = 10 // read from cache for X seconds even if there is internet connection
@@ -122,7 +122,7 @@ class HttpGetCacheManager @Inject constructor(
 
     var offlineInterceptor: Interceptor = Interceptor { chain ->
         var request: Request = chain.request()
-        if (request.method != "GET") {
+        if (request.method() != "GET") {
             val response = chain.proceed(request)
             return@Interceptor response
         }

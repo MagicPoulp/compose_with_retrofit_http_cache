@@ -12,6 +12,12 @@ A modern Android project using a cache of GET requests via retrofit, somewhat li
 
 IMPORTANT. See the list of inconvenients of the HTTP cache in HttGetCacheManager.kt
 
+# other future improvements
+
+- Transitions between offline and online could be better, in partidular if a good retry
+- bug: hen scrolling from the cache and we lack data, we should have a Toastr every time we try to scroll
+- Project setup would be bette if we migrate kapt to ksp, and if we use version catalogs
+
 # Assignment's questions
 
 - give us your context at the time you did this skills test. Were you stressed/relaxed, under some constraints?
@@ -20,14 +26,14 @@ I was relaxed during a public holiday.
 
 - present your work; explain its architecture, main components and how they interact with each other. Feel free to include diagrams as appropriate. Hand-drawn is fine.
 
-Classic :
+Classic work:
 
 A classic clean Architecture is used with use cases, and a repository.
 One view model for the state with a loader
 One view model for the Users List.
 Data is fetched using retrofit and the JSON is parsed. Jetpack component Paging3 is used to load the page lazily.
 
-Innovation :
+Innovation work :
 
 The cache works like a browser for GET requests. It is better than what I did in another repo using REALM and all requests. BEcause we follow the HTTP specification on caching GET requests only,
 and using retrofit to follow the Cache-Control header.

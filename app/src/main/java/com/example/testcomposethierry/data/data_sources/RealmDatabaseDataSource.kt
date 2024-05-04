@@ -8,6 +8,8 @@ import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.log.LogLevel
+import io.realm.kotlin.log.RealmLog
 import io.realm.kotlin.query.RealmResults
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -18,8 +20,19 @@ class RealmDatabaseDataSource @Inject constructor() {
 
     private var realm: Realm
 
+    // https://www.mongodb.com/developer/products/realm/migrate-to-realm-kotlin-sdk/
     init {
-        val config = RealmConfiguration.create(schema = setOf(RealmDataUsersListElement::class))
+        //https://www.mongodb.com/docs/atlas/device-sdks/sdk/kotlin/logging/#std-label-kotlin-logging
+        // the log level can be changed at any time at runtime
+        RealmLog.level = LogLevel.INFO
+
+        val config =
+            RealmConfiguration
+                .Builder(schema = setOf(RealmDataUsersListElement::class))
+                .name("realmDatabaseDataSource.db")
+                .schemaVersion(1)
+                .deleteRealmIfMigrationNeeded()
+                .build()
         realm = Realm.open(config)
     }
 
@@ -34,6 +47,12 @@ class RealmDatabaseDataSource @Inject constructor() {
        return readUserDataWithRange((pageOffset * pageSize ..< (pageOffset + 1) * pageSize).toList())
     }
 
+    /*
+    if we need to delete in realm, use this:
+    findLatest(expenseInfo)?.also {
+        delete(it)
+    }
+    */
     fun saveUsersList(users: List<DomainDataUsersListElement>) {
         val realmList = users.map { RealmDataUsersListElement(
             email = it.email,
@@ -43,16 +62,18 @@ class RealmDatabaseDataSource @Inject constructor() {
             positionInPage = it.positionInPage,
             index = it.pageIndex * AppConfig.pagingSize + it.positionInPage
         ) }
-        realmList.map { saveUserData(it) }
-    }
-
-    private fun saveUserData(userData: RealmDataUsersListElement) {
         try {
             realm.writeBlocking {
+
                 // TODO write in a batch a full list, which may require new Realm object definitions and a new schema
-                copyToRealm(
-                    userData, UpdatePolicy.ALL
-                )
+                // it exists in Realm-java but not in Realm for kotlin
+                // there is an open feature on it
+                // https://github.com/realm/realm-kotlin/issues/959
+                realmList.map { item ->
+                    copyToRealm(
+                        item, UpdatePolicy.ALL
+                    )
+                }
             }
         } catch(t: Throwable) {
             System.err.println(t.message)
