@@ -18,6 +18,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         mainActivityInternetErrorReporter.prepareInternetConnectivityErrorToaster(this)
+
         setContent {
             TestComposeThierryTheme {
                 // we cannot use LocalContext.current
