@@ -30,7 +30,7 @@ class UsersDataPagingSource(
             }
             is ResultOf.Failure -> {
                 response.throwable?.let { LoadResult.Error(it) }
-                    ?: run { LoadResult.Error(Exception(unexpectedServerDataErrorString)) }
+                    ?: run { LoadResult.Error(Exception(response.message)) }
             }
             else -> { LoadResult.Error(Exception(unexpectedServerDataErrorString)) }
         }

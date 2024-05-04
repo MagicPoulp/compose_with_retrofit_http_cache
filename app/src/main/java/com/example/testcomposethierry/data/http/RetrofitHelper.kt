@@ -44,6 +44,10 @@ class RetrofitHelper @Inject constructor(
         //}
 
         // https://stackoverflow.com/questions/44046695/get-response-class-type-in-retrofit2-interceptor-caching-for-realm
+        //
+        // https://stackoverflow.com/questions/53168964/adding-multiple-interceptors-to-an-okhttpclient
+        // The interceptors are run in order of addition for requests and in reverse-order of addition for responses
+        // so here from bottom to top
         builder.addInterceptor(Interceptor { chain ->
             val request = chain.request()
             val response: Response = (try {
@@ -56,8 +60,11 @@ class RetrofitHelper @Inject constructor(
                 // we need to update the internet status so that next requests can use the cache
                 if (t.message?.contains("Unable to resolve host") == true) {
                     networkConnectionManager.checkAgainInternet()
+                    //TODO retru the request but once only, and here is not the right place
+                    // it should be where the retrofit request was done.
+                    // Moreover, retry only GET requests for safety reasons.
                 }
-                if (t.message?.contains("Unable to resolve host") == true) {
+                if (t.message?.contains("timeout") == true) {
                     networkConnectionManager.checkAgainInternet()
                 }
                 throw t

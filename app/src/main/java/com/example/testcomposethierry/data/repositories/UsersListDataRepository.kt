@@ -26,7 +26,7 @@ class UsersListDataRepository @Inject constructor(
 
     private fun createApi() = run {
         api = retrofitHelper.getInstance(
-            baseUrl = AppConfig.artBaseUrl,
+            baseUrl = AppConfig.usersBaseUrl,
             okHttpClient = null,
             requestHeaders = null
         ).create(UsersApi::class.java)
