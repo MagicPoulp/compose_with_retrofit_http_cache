@@ -3,6 +3,7 @@ package com.example.testcomposethierry.ui.components.uistate
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -22,6 +23,7 @@ import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.testcomposethierry.R
 import com.example.testcomposethierry.ui.view_models.UiState
 
 // layout from https://stackoverflow.com/questions/63719072/jetpack-compose-centering-text
@@ -40,20 +42,31 @@ fun ErrorScreen(
             // we could implement a retry button or a back button to avoid restarting the app
             // https://stackoverflow.com/questions/72932093/jetpack-compose-is-there-a-way-to-restart-whole-app-programmatically
             val packageManager: PackageManager = context.packageManager
-            val intent: Intent = packageManager.getLaunchIntentForPackage(context.packageName)!!
-            val componentName: ComponentName = intent.component!!
-            val restartIntent: Intent = Intent.makeRestartActivityTask(componentName)
-            context.startActivity(restartIntent)
+            val intent: Intent? = packageManager.getLaunchIntentForPackage(context.packageName)
+            var couldRestart = false
+            intent?.let {
+                val componentName: ComponentName? = intent.component
+                componentName?.let {
+                    val restartIntent: Intent = Intent.makeRestartActivityTask(componentName)
+                    couldRestart = true
+                    context.startActivity(restartIntent)
+                }
+            }
+            if (!couldRestart) {
+                val errorStringUnableToRestart = context.resources.getString(R.string.error_string_unable_to_restart)
+                Toast.makeText(context,errorStringUnableToRestart, Toast.LENGTH_LONG).show()
+            }
         } )
         .clip(shape = RoundedCornerShape(16.dp)),
     ) {
+        val errorStringAnErrorHasOccurred = context.resources.getString(R.string.error_an_error_has_occurred)
         Box(modifier = Modifier
             .size(350.dp)
             .border(width = 4.dp, color = Gray, shape = RoundedCornerShape(16.dp)),
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "An error has occurred.",
+                text = errorStringAnErrorHasOccurred,
                 modifier = Modifier.padding(16.dp),
                 textAlign = TextAlign.Center,
                 style = typography.h4,

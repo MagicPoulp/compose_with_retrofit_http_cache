@@ -59,8 +59,8 @@ fun UiStateScreen(
     uiStateScreenViewModel: UiStateScreenViewModel = hiltViewModel(),
     activity: ComponentActivity,
 ) {
-    val unexpectedServerDataErrorString = activity.resources.getString(R.string.unexpected_server_data)
-    val internetConnectivityErrorString = activity.resources.getString(R.string.internet_connectivity_error)
+    val unexpectedServerDataErrorString = activity.resources.getString(R.string.error_unexpected_server_data)
+    val internetConnectivityErrorString = activity.resources.getString(R.string.error_internet_connectivity_error)
     uiStateScreenViewModel.startPagerAndDataFetching(
         unexpectedServerDataErrorString = unexpectedServerDataErrorString,
     )
