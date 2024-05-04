@@ -9,15 +9,19 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import android.os.Looper
+import androidx.test.core.app.ActivityScenario.launch
 import dagger.Provides
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -66,10 +70,13 @@ interface InternetConnectionCallback {
 
 interface NetworkConnectionManager {
     val isConnected: StateFlow<Boolean>
+    val isConnectedCheckLoopFlow: Flow<Int>
     val isInitialized: Boolean
     fun checkAgainInternet()
     fun unregister()
 }
+
+const val checkInternetPeriod = 60000L
 
 @Singleton
 class NetworkConnectionManagerImpl @Inject constructor(
@@ -85,6 +92,17 @@ class NetworkConnectionManagerImpl @Inject constructor(
     override val isConnected: StateFlow<Boolean>
         get() = _isConnected.asStateFlow()
     override var isInitialized = false
+    override val isConnectedCheckLoopFlow: Flow<Int> = flow {
+        // here we are always on the main thread by default
+        //assert(Looper.myLooper() == Looper.getMainLooper())
+        // https://elizarov.medium.com/execution-context-of-kotlin-flows-b8c151c9309b
+        withContext(Dispatchers.IO) {
+            while (true) {
+                checkAgainInternet()
+                delay(checkInternetPeriod)
+            }
+        }
+    }
 
     init {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
