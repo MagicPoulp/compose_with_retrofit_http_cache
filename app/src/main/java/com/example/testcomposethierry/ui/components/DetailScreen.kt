@@ -5,13 +5,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
-import com.example.testcomposethierry.data.models.DataUsersListElement
+import com.example.testcomposethierry.data.models.DomainDataUsersListElement
 import com.example.testcomposethierry.ui.components.uistate.ProgressIndicator
 import com.example.testcomposethierry.ui.view_models.DetailScreenViewModel
 
 @Composable
 fun DetailScreen(
-    usersListPagingItems: LazyPagingItems<DataUsersListElement>,
+    usersListPagingItems: LazyPagingItems<DomainDataUsersListElement>,
     rowId: Int,
     detailScreenViewModel: DetailScreenViewModel,
 ) {

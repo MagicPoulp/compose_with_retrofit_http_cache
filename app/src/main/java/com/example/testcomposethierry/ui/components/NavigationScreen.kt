@@ -12,7 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.paging.compose.LazyPagingItems
-import com.example.testcomposethierry.data.models.DataUsersListElement
+import com.example.testcomposethierry.data.models.DomainDataUsersListElement
 import com.example.testcomposethierry.ui.setup.RoutingScreen
 import com.example.testcomposethierry.ui.view_models.DetailScreenViewModel
 import com.example.testcomposethierry.ui.view_models.ListScreenViewModel
@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun NavigationScreen(
     activity: ComponentActivity,
-    usersListPagingItems: LazyPagingItems<DataUsersListElement>,
+    usersListPagingItems: LazyPagingItems<DomainDataUsersListElement>,
     listScreenViewModel: ListScreenViewModel = hiltViewModel(),
     detailScreenViewModel: DetailScreenViewModel = hiltViewModel(),
 ) {

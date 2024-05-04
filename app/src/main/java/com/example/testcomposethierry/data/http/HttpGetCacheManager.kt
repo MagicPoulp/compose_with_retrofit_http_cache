@@ -93,7 +93,9 @@ class HttpGetCacheManager @Inject constructor(
             // https://stackoverflow.com/questions/32547006/connectivitymanager-getnetworkinfoint-deprecated
             var isConnected = false
             val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            @Suppress("DEPRECATION")
             val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
+            @Suppress("DEPRECATION")
             if (activeNetwork != null && activeNetwork.isConnected) {
                 isConnected = true
             }

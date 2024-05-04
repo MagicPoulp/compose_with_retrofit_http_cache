@@ -9,7 +9,7 @@ import androidx.paging.cachedIn
 import com.example.testcomposethierry.BuildConfig
 import com.example.testcomposethierry.data.UsersDataPagingSource
 import com.example.testcomposethierry.data.config.AppConfig
-import com.example.testcomposethierry.data.models.DataUsersListElement
+import com.example.testcomposethierry.data.models.DomainDataUsersListElement
 import com.example.testcomposethierry.data.repositories.UsersListDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -29,7 +29,7 @@ class UiStateScreenViewModel @Inject constructor(
     val uiState: StateFlow<UiState>
         get() = _uiState.asStateFlow()
 
-    lateinit var usersList: Flow<PagingData<DataUsersListElement>>
+    lateinit var usersList: Flow<PagingData<DomainDataUsersListElement>>
     private var isPagerinitialized = false
 
     // ------------------------------------------

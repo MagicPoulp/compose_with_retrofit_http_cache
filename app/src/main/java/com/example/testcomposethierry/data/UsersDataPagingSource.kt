@@ -4,16 +4,16 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.testcomposethierry.data.config.AppConfig
 import com.example.testcomposethierry.data.custom_structures.ResultOf
-import com.example.testcomposethierry.data.models.DataUsersListElement
+import com.example.testcomposethierry.data.models.DomainDataUsersListElement
 import com.example.testcomposethierry.data.repositories.UsersListDataRepository
 
 // https://betterprogramming.pub/turn-the-page-overview-of-android-paging3-library-integration-with-jetpack-compose-3a7881ed75b4
 class UsersDataPagingSource(
     private val unexpectedServerDataErrorString: String,
     private val usersListDataRepository: UsersListDataRepository,
-) : PagingSource<Int, DataUsersListElement>() {
+) : PagingSource<Int, DomainDataUsersListElement>() {
 
-    override suspend fun load(params: LoadParams<Int>):  LoadResult<Int, DataUsersListElement> {
+    override suspend fun load(params: LoadParams<Int>):  LoadResult<Int, DomainDataUsersListElement> {
         // here we wait for the MainActivityViewModel to have loaded
         val nextPageNumber = params.key ?: 0
         val pagingSize = AppConfig.pagingSize
@@ -37,7 +37,7 @@ class UsersDataPagingSource(
     }
 
     // The getRefreshKey() method provides information to the library on which page to load in case the data is invalidated.
-    override fun getRefreshKey(state: PagingState<Int, DataUsersListElement>): Int =
+    override fun getRefreshKey(state: PagingState<Int, DomainDataUsersListElement>): Int =
         ((state.anchorPosition ?: 0) - state.config.initialLoadSize / 2)
             .coerceAtLeast(1)
 }

@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.paging.compose.LazyPagingItems
-import com.example.testcomposethierry.data.models.DataUsersListElement
+import com.example.testcomposethierry.data.models.DomainDataUsersListElement
 
 val horizontalMargin = 20.dp
 val rowHeight = 100.dp
@@ -31,7 +31,7 @@ val rowHeight = 100.dp
 @Composable
 fun ListScreen(
     activeRow: Int,
-    usersListPagingItems: LazyPagingItems<DataUsersListElement>,
+    usersListPagingItems: LazyPagingItems<DomainDataUsersListElement>,
     navController: NavController,
 ) {
     // keep the scrolling state upon screen rotation
@@ -65,7 +65,7 @@ fun ListScreen(
 @Composable
 fun TableItemRow(
     activeRow: Int,
-    item: DataUsersListElement,
+    item: DomainDataUsersListElement,
     index: Int,
     navController: NavController,
 ) {
@@ -85,7 +85,7 @@ fun TableItemRow(
                 // navController.navigate(RoutingScreen.MyDetailScreen.route.replace("{rowId}", "$index"))
             //}
         ) {
-            Text(text = item.name.first + " " + item.name.last)
+            Text(text = item.firstname + " " + item.lastname)
             Text(text = item.email)
         }
         Divider(
