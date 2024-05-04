@@ -18,12 +18,24 @@ class UsersListDataRepository @Inject constructor(
 
     suspend fun getUsersListPaged(pageSize: Int, pageOffset: Int): ResultOf<List<DomainDataUsersListElement>> {
         if (networkConnectionManager.isConnected.value) {
-            val result = internetWithHttp.getUsersListPaged(pageSize, pageOffset)
-            if (result is ResultOf.Success) {
-                realmDatabaseDataSource.saveUsersList(result.value)
+            try {
+                val result = internetWithHttp.getUsersListPaged(pageSize, pageOffset)
+                if (result is ResultOf.Success) {
+                    realmDatabaseDataSource.saveUsersList(result.value)
+                }
+                return result
             }
-            return result
+            catch (t: Throwable)
+            {
+                networkConnectionManager.checkAgainInternet()
+                // TODO make a nicer mechanism of retry (several times, not for all requests, well tested)
+                // if internet works fine but an isolated URL is down,
+                // we will check internet every time on that url
+                System.err.println(t.message)
+                return realmDatabaseDataSource.getUsersListPaged(pageSize, pageOffset)
+            }
         }
+        // TODO, when internet comes back online, we may ask the user to refresh cached data
         return realmDatabaseDataSource.getUsersListPaged(pageSize, pageOffset)
     }
 }

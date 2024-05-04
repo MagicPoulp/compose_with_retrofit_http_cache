@@ -14,8 +14,9 @@ IMPORTANT. See the list of inconveniences of the HTTP cache in HttGetCacheManage
 
 # other future improvements
 
-- Transitions between offline and online could be better, in partidular if a good retry
-- bug: hen scrolling from the cache and we lack data, we should have a Toastr every time we try to scroll
+- Transitions between offline and online could be better, in partidular if the existing retry mechanism (in the repository) is improved
+- When internet comes back online, we may ask the user to refresh cached data
+- bug: when scrolling from the cache and we lack data, we should have a Toastr every time we try to scroll
 - Project setup would be bette if we migrate kapt to ksp, and if we use version catalogs
 
 # Assignment's questions
