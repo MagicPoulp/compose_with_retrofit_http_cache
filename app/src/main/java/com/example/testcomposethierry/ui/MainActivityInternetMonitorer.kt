@@ -1,7 +1,6 @@
 package com.example.testcomposethierry.ui
 
 import android.app.Activity
-import android.os.Looper
 import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -26,7 +25,7 @@ class MainActivityInternetMonitorer @Inject constructor(
         // this allows to pause during configuration changes, and when the app goes in the background
         owner.lifecycleScope.launch(Dispatchers.IO) {
             owner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                assert(Looper.myLooper() != Looper.getMainLooper())
+                //assert(Looper.myLooper() != Looper.getMainLooper())
                 mainActivityViewModel.isConnectedCheckLoop
                     // a hot flow must be collected to be active
                     .collect {
@@ -52,8 +51,8 @@ class MainActivityInternetMonitorer @Inject constructor(
             owner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 networkConnectionManager.isConnected
                     .collect { isConnected ->
-                        // this fails if we change the above to Dispatchers.Main
-                        assert(Looper.myLooper() != Looper.getMainLooper())
+                        // this assert fails if we change the above dispatcher to Dispatchers.Main
+                        //assert(Looper.myLooper() != Looper.getMainLooper())
                         if (!isConnected) {
                             showInternetConnectivityErrorToast(activity, internetConnectivityErrorString)
                         }

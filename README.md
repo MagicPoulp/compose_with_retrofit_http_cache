@@ -10,7 +10,7 @@ A modern Android project using a cache of GET requests via retrofit, somewhat li
 
 # HTTP cache vs database
 
-IMPORTANT. See the list of inconvenients of the HTTP cache in HttGetCacheManager.kt
+IMPORTANT. See the list of inconveniences of the HTTP cache in HttGetCacheManager.kt
 
 # other future improvements
 

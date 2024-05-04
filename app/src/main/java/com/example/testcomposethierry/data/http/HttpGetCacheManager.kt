@@ -10,7 +10,7 @@ import okhttp3.Request
 import javax.inject.Inject
 
 /*
---> Inconvenients of an HTTP cache compared to a local database:
+--> Inconveniences of an HTTP cache compared to a local database:
 - the content of filesDir contains many requests with Authorization Headers.
 Because they all have the same certificate, statistics analysis can break the cypher and get the token.
 - if we have a lot of data, any access to data would need to decrypt responses which is inefficient
@@ -35,9 +35,9 @@ but in the other way around, if in online mode, internet is cut, and if a reques
 we will get a timeout on the revalidation of the request. We must retry, and we do not have
 a good place to do it centralize in interceptors. So architecturally, we cannot isolate the caching
 to the retrofit network layer with interceptors.
-- not an inconvenient, but an improvement needed:
+- not an inconvenience, but an improvement needed:
 we cache everything here, whereas we could decide to cache or not depending on the URL
-- not an inconvenient, but an improvement needed:
+- not an inconvenience, but an improvement needed:
 in the online interceptor, we change the headers of the response to force caching,
 whereas the server may have a deliberate reason to restrict the cache.
 And it becomes problematic to decide to force caching like we do,
