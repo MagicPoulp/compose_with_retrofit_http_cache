@@ -30,7 +30,7 @@ class MainActivityInternetMonitorer @Inject constructor(
                 mainActivityViewModel.isConnectedCheckLoop
                     // a hot flow must be collected to be active
                     .collect {
-                        // println(it)
+                        // System.err.println(it)
                     }
             }
         }
@@ -42,6 +42,8 @@ class MainActivityInternetMonitorer @Inject constructor(
     // the one below happens when internet connectivity changes
     // this is similare to the interface segregation principle, separate things should be separate
     // combining the 2 only micro-optimizes
+    //
+    // Moreover, we have a unit test, and separating things makes unit tests simpler
     fun prepareInternetConnectivityErrorToaster(activity: Activity) {
         val internetConnectivityErrorString = activity.resources.getString(R.string.error_internet_connectivity_error)
         val owner = activity as LifecycleOwner

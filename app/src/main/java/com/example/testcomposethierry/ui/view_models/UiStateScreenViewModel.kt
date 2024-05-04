@@ -36,7 +36,7 @@ class UiStateScreenViewModel @Inject constructor(
 
     suspend fun setUiState(newUiState: UiState) {
         if (BuildConfig.DEBUG && newUiState is UiState.Error) {
-            println(newUiState.error.message)
+            System.err.println(newUiState.error.message)
         }
         if (newUiState != _uiState) {
             _uiState.emit(newUiState)

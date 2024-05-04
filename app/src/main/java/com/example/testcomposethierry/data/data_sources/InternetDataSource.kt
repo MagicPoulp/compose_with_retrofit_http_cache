@@ -2,7 +2,7 @@ package com.example.testcomposethierry.data.data_sources
 
 import com.example.testcomposethierry.data.http.RetrofitHelper
 import com.example.testcomposethierry.domain.internetdatasourceabstract.MapJsonDataToDomainDataUseCase
-import com.example.testcomposethierry.domain.userslistdatarepository.FilterNonBlankUsersListDataUseCase
+import com.example.testcomposethierry.domain.internetdatasourceabstract.FilterNonBlankUsersListDataUseCase
 import javax.inject.Inject
 
 class InternetDataSource @Inject constructor(

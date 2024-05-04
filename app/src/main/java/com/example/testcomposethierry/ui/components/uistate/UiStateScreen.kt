@@ -42,7 +42,7 @@ fun UiStateScreen(
 
     Add a breakpoint in an init in the view Model
     init {
-        println("INIT VIEW MODEL")
+        System.err.println("INIT VIEW MODEL")
     }
 
     restart the activity in the onCreate of the activity

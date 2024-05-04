@@ -6,7 +6,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.testing.TestLifecycleOwner
 import app.cash.turbine.test
 import com.example.testcomposethierry.data.http.NetworkConnectionManager
-import com.example.testcomposethierry.ui.MainActivityInternetErrorReporter
+import com.example.testcomposethierry.ui.MainActivityInternetMonitorer
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
@@ -42,7 +42,7 @@ class ListScreenViewModelUnitTest {
     //@get:Rule
     //val rule = InstantTaskExecutorRule()
 
-    lateinit var mainActivityInternetErrorReporter: MainActivityInternetErrorReporter
+    lateinit var mainActivityInternetErrorReporter: MainActivityInternetMonitorer
     val networkConnectionManager = mockk<NetworkConnectionManager>()
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -59,7 +59,7 @@ class ListScreenViewModelUnitTest {
         //}
         //on { invoke(any()) } doReturn testingPokemonDetails
         // TRICK: recordPrivateCalls = true
-        mainActivityInternetErrorReporter = spyk(MainActivityInternetErrorReporter(networkConnectionManager), recordPrivateCalls = true)
+        mainActivityInternetErrorReporter = spyk(MainActivityInternetMonitorer(networkConnectionManager), recordPrivateCalls = true)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

@@ -3,7 +3,7 @@ package com.example.testcomposethierry.data.data_sources
 import com.example.testcomposethierry.data.http.NetworkConnectionManager
 import com.example.testcomposethierry.data.http.RetrofitHelperWithGetHttpCache
 import com.example.testcomposethierry.domain.internetdatasourceabstract.MapJsonDataToDomainDataUseCase
-import com.example.testcomposethierry.domain.userslistdatarepository.FilterNonBlankUsersListDataUseCase
+import com.example.testcomposethierry.domain.internetdatasourceabstract.FilterNonBlankUsersListDataUseCase
 import kotlinx.coroutines.delay
 import javax.inject.Inject
 

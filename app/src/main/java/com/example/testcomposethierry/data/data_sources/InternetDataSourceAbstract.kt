@@ -6,8 +6,8 @@ import com.example.testcomposethierry.data.http.RetrofitHelperInterface
 import com.example.testcomposethierry.data.http.UsersApi
 import com.example.testcomposethierry.data.models.DomainDataUsersListElement
 import com.example.testcomposethierry.data.models.JsonDataUsersListFull
+import com.example.testcomposethierry.domain.internetdatasourceabstract.FilterNonBlankUsersListDataUseCase
 import com.example.testcomposethierry.domain.internetdatasourceabstract.MapJsonDataToDomainDataUseCase
-import com.example.testcomposethierry.domain.userslistdatarepository.FilterNonBlankUsersListDataUseCase
 import javax.inject.Inject
 
 open class InternetDataSourceAbstract @Inject constructor(
@@ -58,7 +58,7 @@ open class InternetDataSourceAbstract @Inject constructor(
             val response = api.getUsersListPaged(inc, pageSize, pageOffset, AppConfig.seed)
             if (response.isSuccessful) {
                 return response.body()?.let { dataUsersListFull: JsonDataUsersListFull ->
-                    val mappedData = mapJsonDataToDomainDataUseCase(dataUsersListFull)
+                    val mappedData = mapJsonDataToDomainDataUseCase(dataUsersListFull, pageOffset)
                     ResultOf.Success(filterNonBlankUsersListDataUseCase(mappedData))
                 } ?: run {  ResultOf.Failure(response.message(), null) }
             }

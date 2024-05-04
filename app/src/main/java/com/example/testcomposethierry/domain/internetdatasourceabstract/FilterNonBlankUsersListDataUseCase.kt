@@ -1,4 +1,4 @@
-package com.example.testcomposethierry.domain.userslistdatarepository
+package com.example.testcomposethierry.domain.internetdatasourceabstract
 
 import com.example.testcomposethierry.data.models.DomainDataUsersListElement
 import javax.inject.Inject

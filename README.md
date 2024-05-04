@@ -8,6 +8,10 @@ April 2024
 
 A modern Android project using a cache of GET requests via retrofit, somewhat like browsers do.
 
+# HTTP cache vs database
+
+IMPORTANT. See the list of inconvenients of the HTTP cache in HttGetCacheManager.kt
+
 # Assignment's questions
 
 - give us your context at the time you did this skills test. Were you stressed/relaxed, under some constraints?
