@@ -1,6 +1,7 @@
 package com.example.testcomposethierry
 
 import android.app.Activity
+import android.content.res.Resources
 import android.os.Looper
 import androidx.activity.ComponentActivity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -10,6 +11,7 @@ import androidx.lifecycle.testing.TestLifecycleOwner
 import app.cash.turbine.test
 import com.example.testcomposethierry.data.http.NetworkConnectionManager
 import com.example.testcomposethierry.data.repositories.UsersListDataRepository
+import com.example.testcomposethierry.ui.MainActivityInternetErrorReporter
 import com.example.testcomposethierry.ui.view_models.ListScreenViewModel
 import io.mockk.every
 import io.mockk.justRun
@@ -50,7 +52,7 @@ class ListScreenViewModelUnitTest {
     //@get:Rule
     //val rule = InstantTaskExecutorRule()
 
-    lateinit var listScreenViewModel: ListScreenViewModel
+    lateinit var mainActivityInternetErrorReporter: MainActivityInternetErrorReporter
     val networkConnectionManager = mockk<NetworkConnectionManager>()
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -59,7 +61,6 @@ class ListScreenViewModelUnitTest {
         // https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-test/MIGRATION.md
         // this dispatcher skips delays
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        val usersListDataRepository = mockk<UsersListDataRepository>()
         //{
             //onBlocking { getPokemon() } doReturn testingPokemonList
         //}
@@ -68,7 +69,7 @@ class ListScreenViewModelUnitTest {
         //}
         //on { invoke(any()) } doReturn testingPokemonDetails
         // TRICK: recordPrivateCalls = true
-        listScreenViewModel = spyk(ListScreenViewModel(usersListDataRepository, networkConnectionManager), recordPrivateCalls = true)
+        mainActivityInternetErrorReporter = spyk(MainActivityInternetErrorReporter(networkConnectionManager), recordPrivateCalls = true)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -83,18 +84,21 @@ class ListScreenViewModelUnitTest {
         every { networkConnectionManager.isConnected } returns flowIsConnected
         val errorString = "error"
         val activity = mockk<ComponentActivity>()
+        val resources = mockk<Resources>()
+        every { activity.resources } returns resources
+        every { resources.getString(any()) } returns errorString
         val testLifecycleOwner = TestLifecycleOwner()
         every { activity.lifecycle } returns testLifecycleOwner.lifecycle
-        justRun { listScreenViewModel invoke "showInternetConnectivityErrorToast" withArguments listOf(activity, errorString) }
+        justRun { mainActivityInternetErrorReporter invoke "showInternetConnectivityErrorToast" withArguments listOf(activity, errorString) }
         networkConnectionManager.isConnected.test {
             // TRICK  based on previous experiences, the collect in listScreenViewModel has consumed one awaitItem() for the initial value
-            listScreenViewModel.prepareInternetConnectivityErrorToaster(activity, errorString)
+            mainActivityInternetErrorReporter.prepareInternetConnectivityErrorToaster(activity)
             testLifecycleOwner.currentState = Lifecycle.State.STARTED
             awaitItem()
             ensureAllEventsConsumed()
         }
         // TRICK: test that a private method is called
-        verify(exactly = 1) { listScreenViewModel invoke "showInternetConnectivityErrorToast" withArguments listOf(activity, errorString)}
+        verify(exactly = 1) { mainActivityInternetErrorReporter invoke "showInternetConnectivityErrorToast" withArguments listOf(activity, errorString)}
     }
 
     @Test
@@ -103,17 +107,20 @@ class ListScreenViewModelUnitTest {
         every { networkConnectionManager.isConnected } returns flowIsConnected
         val errorString = "error"
         val activity = mockk<ComponentActivity>()
+        val resources = mockk<Resources>()
+        every { activity.resources } returns resources
+        every { resources.getString(any()) } returns errorString
         val testLifecycleOwner = TestLifecycleOwner()
         every { activity.lifecycle } returns testLifecycleOwner.lifecycle
-        justRun { listScreenViewModel invoke "showInternetConnectivityErrorToast" withArguments listOf(activity, errorString) }
+        justRun { mainActivityInternetErrorReporter invoke "showInternetConnectivityErrorToast" withArguments listOf(activity, errorString) }
         // TRICK: turbine and awaitItem() are used
         networkConnectionManager.isConnected.test {
             testLifecycleOwner.currentState = Lifecycle.State.INITIALIZED
-            listScreenViewModel.prepareInternetConnectivityErrorToaster(activity, errorString)
+            mainActivityInternetErrorReporter.prepareInternetConnectivityErrorToaster(activity)
             awaitItem()
             ensureAllEventsConsumed()
         }
         // TRICK: test that a private method is called
-        verify(exactly = 0) { listScreenViewModel invoke "showInternetConnectivityErrorToast" withArguments listOf(activity, errorString)}
+        verify(exactly = 0) { mainActivityInternetErrorReporter invoke "showInternetConnectivityErrorToast" withArguments listOf(activity, errorString)}
     }
 }
