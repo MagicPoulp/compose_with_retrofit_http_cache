@@ -10,7 +10,10 @@ import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmResults
 import javax.inject.Inject
+import javax.inject.Singleton
 
+// it must be a singleton because we close Realm in MainActivityViewModel
+@Singleton
 class RealmDatabaseDataSource @Inject constructor() {
 
     private var realm: Realm
@@ -18,6 +21,10 @@ class RealmDatabaseDataSource @Inject constructor() {
     init {
         val config = RealmConfiguration.create(schema = setOf(RealmDataUsersListElement::class))
         realm = Realm.open(config)
+    }
+
+    fun close() {
+        realm.close()
     }
 
     fun getUsersListPaged(
