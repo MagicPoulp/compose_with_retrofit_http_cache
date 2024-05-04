@@ -41,8 +41,6 @@ fun NavigationScreen(
     listScreenViewModel: ListScreenViewModel = hiltViewModel(),
     detailScreenViewModel: DetailScreenViewModel = hiltViewModel(),
 ) {
-    val internetConnectivityErrorString = activity.resources.getString(R.string.error_internet_connectivity_error)
-    listScreenViewModel.prepareInternetConnectivityErrorToaster(activity, internetConnectivityErrorString)
     val navController = rememberNavController()
     navController.addOnDestinationChangedListener { _, destination, _ ->
         CoroutineScope(Dispatchers.IO).launch {

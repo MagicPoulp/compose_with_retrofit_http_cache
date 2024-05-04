@@ -32,7 +32,6 @@ sealed class UiState {
 @HiltViewModel
 class ListScreenViewModel @Inject constructor(
     private val usersListDataRepository: UsersListDataRepository,
-    private val networkConnectionManager: NetworkConnectionManager,
 ) : ViewModel() {
     private val _activeRow: MutableStateFlow<Int> = MutableStateFlow(-1)
     val activeRow: StateFlow<Int>
@@ -40,37 +39,9 @@ class ListScreenViewModel @Inject constructor(
 
     // ------------------------------------------
 
-    fun prepareInternetConnectivityErrorToaster(activity: Activity, internetConnectivityErrorString: String) {
-        val owner = activity as LifecycleOwner
-        // this allows to pause during configuration changes, and when the app goes in the background
-        owner.lifecycleScope.launch(Dispatchers.IO) {
-            owner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                networkConnectionManager.isConnected
-                    .collect { isConnected ->
-                        if (!isConnected) {
-                            showInternetConnectivityErrorToast(activity, internetConnectivityErrorString)
-                        }
-                    }
-            }
-        }
-    }
-
-    private fun showInternetConnectivityErrorToast(activity: Activity, internetConnectivityErrorString: String) {
-        runBlocking {
-            launch(Dispatchers.Main) {
-                Toast.makeText(activity, internetConnectivityErrorString, Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
     fun setActiveRow(owner: LifecycleOwner, rowId: Int) {
         owner.lifecycleScope.launch {
             _activeRow.emit(rowId)
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        networkConnectionManager.unregister()
     }
 }
